@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EstudAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary:  '#FF6B4A',
+            'primary-light': '#FF8A70',
+            'primary-dark':  '#E5542F',
+            dark:     '#0F1117',
+            'dark-2': '#1A1D27',
+            'dark-3': '#252836',
+            apoio1:   '#3B82F6',
+            apoio2:   '#10B981',
+            apoio3:   '#8B5CF6',
+            fundo:    '#F4F5F7',
+            'surface': '#FFFFFF',
+          },
+          fontFamily: {
+            sans:    ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['Sora', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.06)',
+            'card-hover': '0 4px 6px rgba(0,0,0,.07), 0 10px 28px rgba(0,0,0,.10)',
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .logo-text { font-family: 'Sora', sans-serif; }
+
+    /* Sidebar */
+    .sidebar-link { transition: background .12s, color .12s; }
+    .sidebar-link:hover  { background: rgba(255,107,74,.12); color: #FF6B4A; }
+    .sidebar-link.active { background: rgba(255,107,74,.15); color: #FF6B4A; border-left: 3px solid #FF6B4A; }
+
+    /* Pages */
+    .page { display: none; }
+    .page.active { display: flex; flex-direction: column; flex: 1; }
+    #auth-page { display: none; }
+    #auth-page.active { display: flex; }
+
+    /* Cards */
+    .card-hover { transition: transform .18s, box-shadow .18s; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
+
+    /* XP gradient */
+    .xp-gradient { background: linear-gradient(135deg, #FF6B4A, #FF3D1F); }
+
+    /* Skeleton */
+    .skeleton { background: linear-gradient(90deg, #e8eaed 25%, #f4f5f7 50%, #e8eaed 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+
+    /* Typing indicator */
+    .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: #94a3b8; animation: typing-bounce 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: .2s; }
+    .typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes typing-bounce { 0%,80%,100% { transform: scale(0.7); opacity:.5; } 40% { transform: scale(1); opacity:1; } }
+
+    /* Progress ring */
+    .progress-ring { transform: rotate(-90deg); }
+
+    /* Auth fade */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp .45s ease both; }
+
+    /* Notification dot */
+    .notif-dot { position:absolute; top:6px; right:6px; width:8px; height:8px; background:#FF6B4A; border-radius:50%; border:2px solid white; }
+
+    /* Quiz option */
+    .quiz-option { transition: all .15s; }
+    .quiz-option:hover:not(:disabled) { border-color:#FF6B4A; background:rgba(255,107,74,.05); }
+    .quiz-option.correct { border-color:#10B981; background:rgba(16,185,129,.08); }
+    .quiz-option.wrong   { border-color:#EF4444; background:rgba(239,68,68,.08); }
+
+    /* Badge pulse */
+    @keyframes badge-pop { 0% { transform:scale(1); } 50% { transform:scale(1.15); } 100% { transform:scale(1); } }
+    .badge-pop { animation: badge-pop .4s ease; }
+
+    /* Podcast wave */
+    @keyframes wave { 0%,100% { height:4px; } 50% { height:14px; } }
+    .wave-bar { width:3px; border-radius:2px; background:#FF6B4A; display:inline-block; animation: wave 1s ease-in-out infinite; }
+    .wave-bar:nth-child(2) { animation-delay:.15s; }
+    .wave-bar:nth-child(3) { animation-delay:.3s; }
+    .wave-bar:nth-child(4) { animation-delay:.15s; }
+
+    /* Mobile nav label */
+    .mobile-nav-btn.active span.nav-icon { color: #FF6B4A; }
+    .mobile-nav-btn.active span.nav-label { color: #FF6B4A; }
+
+    /* Role badge */
+    .role-badge { font-size:10px; padding:2px 8px; border-radius:99px; font-weight:600; }
+
+    /* Flashcard flip */
+    .flashcard-scene { perspective:1000px; cursor:pointer; }
+    .flashcard-inner { position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d; }
+    .flashcard-scene.flipped .flashcard-inner { transform:rotateY(180deg); }
+    .flashcard-front, .flashcard-back { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:16px; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .flashcard-back { transform:rotateY(180deg); }
+  </style>
+</head>
+<body class="bg-fundo text-dark antialiased">
+
+<!-- ══════════════════════════════════════════════════════
+     AUTH PAGE
+══════════════════════════════════════════════════════ -->
+<div id="auth-page" class="min-h-screen bg-gradient-to-br from-dark via-dark-2 to-dark-3 items-center justify-center p-4">
+  <div class="w-full max-w-md fade-up">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2.5 mb-3">
+        <div class="w-11 h-11 rounded-2xl xp-gradient flex items-center justify-center shadow-lg">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+        <span class="logo-text text-3xl font-bold text-white tracking-tight">EstudAI</span>
+      </div>
+      <p class="text-slate-400 text-sm">Plataforma de aprendizado com IA</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl p-8 shadow-2xl">
+      <!-- Tabs -->
+      <div class="flex gap-1 bg-slate-100 rounded-xl p-1 mb-6">
+        <button onclick="switchAuthTab('login')" id="tab-login" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white text-dark shadow-sm">Entrar</button>
+        <button onclick="switchAuthTab('register')" id="tab-register" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all text-slate-500">Cadastrar</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="form-login" class="space-y-4">
+        <!-- Role selector -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-2 uppercase tracking-wide">Entrar como</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="selectRole('student')" id="role-student" class="role-btn flex items-center gap-2 p-3 rounded-xl border-2 border-primary bg-primary/5 text-sm font-medium text-primary transition">
+              <span class="text-base">🎓</span> Aluno
+            </button>
+            <button onclick="selectRole('teacher')" id="role-teacher" class="role-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-200 text-sm font-medium text-slate-500 transition hover:border-slate-300">
+              <span class="text-base">👩‍🏫</span> Professor
+            </button>
+            <button onclick="selectRole('principal')" id="role-principal" class="role-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-200 text-sm font-medium text-slate-500 transition hover:border-slate-300">
+              <span class="text-base">🏫</span> Diretor
+            </button>
+            <button onclick="selectRole('manager')" id="role-manager" class="role-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-200 text-sm font-medium text-slate-500 transition hover:border-slate-300">
+              <span class="text-base">🗂️</span> Gestor
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">E-mail institucional</label>
+          <input type="email" placeholder="usuario@escola.edu.br" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">Senha</label>
+          <div class="relative">
+            <input type="password" id="login-password" placeholder="••••••••" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition pr-10" />
+            <button onclick="togglePassword('login-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">👁</button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+            <input type="checkbox" class="rounded accent-primary" /> Lembrar de mim
+          </label>
+          <a href="#" class="text-sm text-primary hover:text-primary-dark font-medium">Esqueci a senha</a>
+        </div>
+        <button onclick="enterApp()" class="w-full py-3 xp-gradient hover:opacity-90 text-white font-bold rounded-xl transition text-sm shadow-md shadow-primary/30">
+          Entrar na plataforma →
+        </button>
+        <div class="relative my-1">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+          <div class="relative flex justify-center"><span class="bg-white px-3 text-xs text-slate-400">ou</span></div>
+        </div>
+        <button class="w-full py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-2 transition">
+          <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Entrar com Google
+        </button>
+      </div>
+
+      <!-- Register Form -->
+      <div id="form-register" class="hidden space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Nome</label>
+            <input type="text" placeholder="João" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Sobrenome</label>
+            <input type="text" placeholder="Silva" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">E-mail</label>
+          <input type="email" placeholder="aluno@escola.edu.br" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">Código da escola</label>
+          <input type="text" placeholder="ESC-2024-XXXXX" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1.5">Senha</label>
+          <input type="password" placeholder="Mín. 8 caracteres" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+        </div>
+        <button onclick="enterApp()" class="w-full py-3 xp-gradient hover:opacity-90 text-white font-bold rounded-xl transition text-sm shadow-md shadow-primary/30">Criar conta →</button>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-slate-500 mt-4">
+      Ao entrar, você concorda com os <a href="#" class="underline text-slate-400">Termos de Uso</a> e a <a href="#" class="underline text-slate-400">Política de Privacidade LGPD</a>
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════════════════ -->
+<div id="app-shell" class="hidden min-h-screen flex">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="hidden lg:flex flex-col w-60 bg-dark text-white fixed inset-y-0 left-0 z-30 overflow-y-auto">
+
+    <!-- Logo -->
+    <div class="flex items-center gap-2.5 px-5 py-5 border-b border-white/10">
+      <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      </div>
+      <span class="logo-text text-xl font-bold text-white">EstudAI</span>
+    </div>
+
+    <!-- User card -->
+    <div class="flex items-center gap-3 px-4 py-4 border-b border-white/10">
+      <div class="w-9 h-9 rounded-full xp-gradient flex items-center justify-center text-white font-bold text-sm flex-shrink-0" id="sidebar-avatar">JS</div>
+      <div class="min-w-0">
+        <p class="text-sm font-semibold truncate" id="sidebar-name">João Silva</p>
+        <p class="text-xs text-slate-400 truncate" id="sidebar-role-label">Aluno · 3º Ano A</p>
+      </div>
+      <div class="ml-auto xp-gradient text-white text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 leading-5">⚡ 1.2k</div>
+    </div>
+
+    <!-- Streak -->
+    <div class="mx-4 mt-3 mb-1 bg-primary/15 border border-primary/25 rounded-xl px-3 py-2 flex items-center gap-2">
+      <span class="text-lg">🔥</span>
+      <div>
+        <p class="text-xs font-bold text-primary">7 dias seguidos!</p>
+        <p class="text-[10px] text-slate-400">Continue para ganhar bônus</p>
+      </div>
+    </div>
+
+    <!-- Nav — dynamically filtered by role -->
+    <nav class="flex-1 px-3 py-3 space-y-0.5" id="sidebar-nav">
+      <!-- injected by JS based on role -->
+    </nav>
+
+    <!-- Footer -->
+    <div class="px-3 py-3 border-t border-white/10 space-y-0.5">
+      <a onclick="navigate('config')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm text-slate-300">
+        <span class="text-base">⚙️</span> Configurações
+      </a>
+      <a onclick="showAuth()" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm text-slate-300">
+        <span class="text-base">🚪</span> Sair
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN AREA ── -->
+  <div class="flex-1 flex flex-col lg:ml-60">
+
+    <!-- TOPBAR -->
+    <header class="bg-white border-b border-slate-200 px-4 lg:px-6 py-3 flex items-center gap-3 sticky top-0 z-20">
+      <!-- Mobile logo -->
+      <div class="lg:hidden flex items-center gap-2 mr-1">
+        <div class="w-8 h-8 rounded-lg xp-gradient flex items-center justify-center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+        <span class="logo-text text-lg font-bold text-dark">EstudAI</span>
+      </div>
+
+      <h1 id="section-title" class="text-sm font-bold text-dark hidden lg:block"></h1>
+
+      <!-- Search -->
+      <div class="flex-1 max-w-sm mx-auto lg:mx-0 lg:ml-4">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" placeholder="Buscar conteúdo, matérias..." class="w-full pl-9 pr-4 py-2 bg-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25 focus:bg-white transition border border-transparent focus:border-primary/25" />
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="flex items-center gap-2 ml-auto">
+        <div class="hidden sm:flex items-center gap-1.5 xp-gradient text-white text-xs font-bold px-3 py-1.5 rounded-full">⚡ 1.240 XP</div>
+        <div class="hidden sm:flex items-center gap-1 bg-orange-50 border border-orange-200 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full">🔥 7</div>
+        <!-- Notifications -->
+        <button onclick="toggleNotifications()" class="relative w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition" id="notif-btn">
+          <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span class="notif-dot" id="notif-indicator"></span>
+        </button>
+        <!-- Avatar -->
+        <div onclick="navigate('config')" class="w-9 h-9 rounded-full xp-gradient flex items-center justify-center text-white font-bold text-sm cursor-pointer" id="topbar-avatar">JS</div>
+      </div>
+    </header>
+
+    <!-- Notifications dropdown -->
+    <div id="notif-panel" class="hidden fixed top-14 right-4 lg:right-6 bg-white rounded-2xl shadow-xl border border-slate-100 w-80 z-50 overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+        <p class="text-sm font-bold">Notificações</p>
+        <button onclick="markAllRead()" class="text-xs text-primary font-medium">Marcar todas como lidas</button>
+      </div>
+      <div class="max-h-72 overflow-y-auto">
+        <div class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-l-2 border-primary">
+          <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-base flex-shrink-0">🏆</div>
+          <div>
+            <p class="text-sm font-medium">Nova conquista desbloqueada!</p>
+            <p class="text-xs text-slate-400">Você completou 7 dias seguidos · 2min atrás</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-l-2 border-transparent">
+          <div class="w-8 h-8 bg-apoio1/10 rounded-lg flex items-center justify-center text-base flex-shrink-0">📊</div>
+          <div>
+            <p class="text-sm font-medium">Resultado do simulado disponível</p>
+            <p class="text-xs text-slate-400">Biologia · Divisão Celular · ontem</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-l-2 border-transparent">
+          <div class="w-8 h-8 bg-apoio2/10 rounded-lg flex items-center justify-center text-base flex-shrink-0">📝</div>
+          <div>
+            <p class="text-sm font-medium">Ana publicou um resumo de Biologia</p>
+            <p class="text-xs text-slate-400">Rede Social · 2 dias atrás</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <main class="flex-1 overflow-y-auto pb-20 lg:pb-6">
+
+      <!-- ── HOME ── -->
+      <div id="page-home" class="page active p-4 lg:p-6 space-y-5">
+
+        <!-- Welcome banner -->
+        <div class="bg-gradient-to-r from-dark to-dark-2 rounded-2xl p-5 text-white relative overflow-hidden">
+          <div class="absolute right-0 top-0 w-48 h-48 bg-primary/15 rounded-full -translate-y-1/3 translate-x-1/3"></div>
+          <div class="absolute right-16 bottom-0 w-28 h-28 bg-apoio3/15 rounded-full translate-y-1/2"></div>
+          <p class="text-sm text-slate-400 mb-0.5" id="home-greeting">Bom dia, João! 👋</p>
+          <h2 class="text-xl font-bold mb-3">Continue de onde parou</h2>
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2.5">
+              <p class="text-slate-400 text-xs">Última matéria</p>
+              <p class="font-bold text-sm">Biologia · Cap. 4</p>
+            </div>
+            <button onclick="navigate('chat')" class="xp-gradient hover:opacity-90 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition shadow-md shadow-primary/30">
+              Continuar →
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats + Progress side by side -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-white rounded-xl p-4 border border-slate-100 card-hover cursor-pointer" onclick="navigate('resumos')">
+            <p class="text-2xl font-extrabold text-apoio1">24</p>
+            <p class="text-xs text-slate-500 mt-0.5 font-medium">Resumos criados</p>
+            <p class="text-[10px] text-apoio2 mt-1 font-semibold">↑ 3 esta semana</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 border border-slate-100 card-hover cursor-pointer" onclick="navigate('simulados')">
+            <p class="text-2xl font-extrabold text-apoio2">85%</p>
+            <p class="text-xs text-slate-500 mt-0.5 font-medium">Taxa de acerto</p>
+            <p class="text-[10px] text-apoio2 mt-1 font-semibold">↑ 5% vs. semana passada</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 border border-slate-100 card-hover cursor-pointer" onclick="navigate('podcasts')">
+            <p class="text-2xl font-extrabold text-apoio3">12</p>
+            <p class="text-xs text-slate-500 mt-0.5 font-medium">Podcasts gerados</p>
+            <p class="text-[10px] text-slate-400 mt-1 font-semibold">≈ 1h 42min ouvidos</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 border border-slate-100 card-hover cursor-pointer" onclick="navigate('conquistas')">
+            <p class="text-2xl font-extrabold text-primary">8</p>
+            <p class="text-xs text-slate-500 mt-0.5 font-medium">Simulados feitos</p>
+            <p class="text-[10px] text-apoio2 mt-1 font-semibold">↑ 2 esta semana</p>
+          </div>
+        </div>
+
+        <!-- Activity + Sidebar -->
+        <div class="grid lg:grid-cols-3 gap-4">
+          <!-- Recent Activity -->
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-100 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-sm">Atividade Recente</h3>
+              <button class="text-xs text-primary font-semibold">Ver tudo</button>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition" onclick="navigate('resumos')">
+                <div class="w-9 h-9 bg-apoio1/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">📝</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold truncate">Resumo: Mitose e Meiose</p>
+                  <p class="text-xs text-slate-400">Biologia · há 2 horas</p>
+                </div>
+                <span class="text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full">+50 XP</span>
+              </div>
+              <div class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition" onclick="navigate('simulados')">
+                <div class="w-9 h-9 bg-apoio3/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">📋</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold truncate">Simulado: Funções do 2º Grau</p>
+                  <p class="text-xs text-slate-400">Matemática · ontem</p>
+                </div>
+                <span class="text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full">+120 XP</span>
+              </div>
+              <div class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition" onclick="navigate('podcasts')">
+                <div class="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🎙️</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold truncate">Podcast: Revolução Industrial</p>
+                  <p class="text-xs text-slate-400">História · ontem</p>
+                </div>
+                <span class="text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full">+80 XP</span>
+              </div>
+              <div class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition" onclick="navigate('chat')">
+                <div class="w-9 h-9 bg-apoio2/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🤖</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold truncate">Chat: dúvida sobre osmose</p>
+                  <p class="text-xs text-slate-400">Biologia · 2 dias atrás</p>
+                </div>
+                <span class="text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full">+20 XP</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right column -->
+          <div class="space-y-4">
+            <!-- XP Level -->
+            <div class="bg-white rounded-xl border border-slate-100 p-4">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p class="text-xs text-slate-500 font-medium">Nível atual</p>
+                  <p class="text-sm font-extrabold">Nível 8 · Estudioso</p>
+                </div>
+                <div class="w-10 h-10 rounded-full xp-gradient flex items-center justify-center text-white font-extrabold text-sm">8</div>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2 mb-1">
+                <div class="xp-gradient h-2 rounded-full transition-all" style="width: 83%"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+                <span>1.240 XP</span>
+                <span>260 XP para Nível 9</span>
+              </div>
+            </div>
+
+            <!-- Daily goals -->
+            <div class="bg-white rounded-xl border border-slate-100 p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-sm">Metas de Hoje</h3>
+                <span class="text-xs text-slate-400 font-medium">1/3</span>
+              </div>
+              <div class="space-y-2.5">
+                <div class="flex items-center gap-2.5 text-sm">
+                  <div class="w-5 h-5 rounded-full bg-apoio2 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">✓</div>
+                  <span class="line-through text-slate-400">1 resumo gerado</span>
+                </div>
+                <div class="flex items-center gap-2.5 text-sm">
+                  <div class="w-5 h-5 rounded-full border-2 border-slate-200 flex-shrink-0"></div>
+                  <span class="font-medium">Fazer 1 simulado</span>
+                </div>
+                <div class="flex items-center gap-2.5 text-sm">
+                  <div class="w-5 h-5 rounded-full border-2 border-slate-200 flex-shrink-0"></div>
+                  <span class="font-medium">30 min de estudo</span>
+                </div>
+                <!-- Study timer -->
+                <div class="mt-2 pt-2 border-t border-slate-100">
+                  <div class="flex items-center justify-between text-xs mb-1.5">
+                    <span class="text-slate-500 font-medium">Tempo de hoje</span>
+                    <span class="font-bold text-dark" id="study-timer">00:14:32</span>
+                  </div>
+                  <div class="w-full bg-slate-100 rounded-full h-1.5">
+                    <div class="bg-apoio3 h-1.5 rounded-full" style="width: 48%"></div>
+                  </div>
+                  <p class="text-[10px] text-slate-400 mt-1">14 min de 30 min</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggested for you -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-sm">Sugerido para você</h3>
+            <button onclick="navigate('biblioteca')" class="text-xs text-primary font-semibold">Ver biblioteca →</button>
+          </div>
+          <div class="grid sm:grid-cols-3 gap-3">
+            <div class="bg-white rounded-xl border border-slate-100 p-4 card-hover cursor-pointer" onclick="navigate('chat')">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">🧬</span>
+                <span class="text-xs font-bold text-apoio1 bg-apoio1/10 px-2 py-0.5 rounded-full">Biologia</span>
+              </div>
+              <p class="text-sm font-bold">Divisão Celular</p>
+              <p class="text-xs text-slate-400 mt-0.5">Cap. 5 · ~15 min · 🤖 Pergunte à IA</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-100 p-4 card-hover cursor-pointer" onclick="navigate('simulados')">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">📐</span>
+                <span class="text-xs font-bold text-apoio3 bg-apoio3/10 px-2 py-0.5 rounded-full">Matemática</span>
+              </div>
+              <p class="text-sm font-bold">Logaritmos</p>
+              <p class="text-xs text-slate-400 mt-0.5">Cap. 8 · ~20 min · 📋 Fazer simulado</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-100 p-4 card-hover cursor-pointer" onclick="navigate('podcasts')">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">⚗️</span>
+                <span class="text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full">Química</span>
+              </div>
+              <p class="text-sm font-bold">Ligações Iônicas</p>
+              <p class="text-xs text-slate-400 mt-0.5">Cap. 3 · ~12 min · 🎙️ Ouvir podcast</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BIBLIOTECA ── -->
+      <div id="page-biblioteca" class="page p-4 lg:p-6 space-y-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-extrabold">Biblioteca</h2>
+            <p class="text-sm text-slate-500">Livros didáticos da sua escola</p>
+          </div>
+        </div>
+        <!-- Filters -->
+        <div class="flex gap-2 flex-wrap">
+          <button class="bg-dark text-white text-xs font-bold px-4 py-1.5 rounded-full" id="filter-todos" onclick="filterBooks('todos')">Todos</button>
+          <button onclick="filterBooks('bio')" class="filter-btn bg-white border border-slate-200 text-slate-600 text-xs font-medium px-4 py-1.5 rounded-full hover:border-apoio1 hover:text-apoio1 transition">🧬 Biologia</button>
+          <button onclick="filterBooks('mat')" class="filter-btn bg-white border border-slate-200 text-slate-600 text-xs font-medium px-4 py-1.5 rounded-full hover:border-apoio3 hover:text-apoio3 transition">📐 Matemática</button>
+          <button onclick="filterBooks('fis')" class="filter-btn bg-white border border-slate-200 text-slate-600 text-xs font-medium px-4 py-1.5 rounded-full hover:border-apoio1 hover:text-apoio1 transition">⚡ Física</button>
+          <button onclick="filterBooks('qui')" class="filter-btn bg-white border border-slate-200 text-slate-600 text-xs font-medium px-4 py-1.5 rounded-full hover:border-apoio2 hover:text-apoio2 transition">⚗️ Química</button>
+          <button onclick="filterBooks('his')" class="filter-btn bg-white border border-slate-200 text-slate-600 text-xs font-medium px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition">📜 História</button>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div class="bg-white rounded-xl border border-slate-100 overflow-hidden card-hover cursor-pointer" onclick="navigate('chat')">
+            <div class="h-32 bg-gradient-to-br from-apoio1/20 to-apoio1/5 flex items-center justify-center text-5xl">📘</div>
+            <div class="p-3">
+              <span class="text-xs font-bold text-apoio1 bg-apoio1/10 px-2 py-0.5 rounded-full">Biologia</span>
+              <p class="text-sm font-bold mt-2">Biologia Celular e Molecular</p>
+              <p class="text-xs text-slate-400 mt-0.5">3ª ed. · Poliedro · 24 capítulos</p>
+              <div class="mt-2 flex items-center gap-1.5">
+                <div class="flex-1 bg-slate-100 rounded-full h-1.5"><div class="bg-apoio2 h-1.5 rounded-full" style="width: 65%"></div></div>
+                <span class="text-xs text-slate-400 font-medium">65%</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 overflow-hidden card-hover cursor-pointer" onclick="navigate('chat')">
+            <div class="h-32 bg-gradient-to-br from-apoio3/20 to-apoio3/5 flex items-center justify-center text-5xl">📗</div>
+            <div class="p-3">
+              <span class="text-xs font-bold text-apoio3 bg-apoio3/10 px-2 py-0.5 rounded-full">Matemática</span>
+              <p class="text-sm font-bold mt-2">Matemática e suas Tecnologias</p>
+              <p class="text-xs text-slate-400 mt-0.5">2ª ed. · SAS · 18 capítulos</p>
+              <div class="mt-2 flex items-center gap-1.5">
+                <div class="flex-1 bg-slate-100 rounded-full h-1.5"><div class="bg-apoio2 h-1.5 rounded-full" style="width: 40%"></div></div>
+                <span class="text-xs text-slate-400 font-medium">40%</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 overflow-hidden card-hover cursor-pointer" onclick="navigate('chat')">
+            <div class="h-32 bg-gradient-to-br from-apoio2/20 to-apoio2/5 flex items-center justify-center text-5xl">📙</div>
+            <div class="p-3">
+              <span class="text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full">Química</span>
+              <p class="text-sm font-bold mt-2">Química para o Ensino Médio</p>
+              <p class="text-xs text-slate-400 mt-0.5">1ª ed. · Etapa · 20 capítulos</p>
+              <div class="mt-2 flex items-center gap-1.5">
+                <div class="flex-1 bg-slate-100 rounded-full h-1.5"><div class="bg-apoio2 h-1.5 rounded-full" style="width: 20%"></div></div>
+                <span class="text-xs text-slate-400 font-medium">20%</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 overflow-hidden">
+            <div class="h-32 skeleton"></div>
+            <div class="p-3 space-y-2">
+              <div class="skeleton h-3 w-16 rounded-full"></div>
+              <div class="skeleton h-4 w-full rounded"></div>
+              <div class="skeleton h-3 w-24 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CHAT ── -->
+      <div id="page-chat" class="page" style="height:calc(100vh - 57px); display:none; flex-direction:column;">
+        <!-- Subject selector bar -->
+        <div class="bg-white border-b border-slate-100 px-4 py-2.5 flex items-center gap-2 overflow-x-auto flex-shrink-0">
+          <span class="text-xs font-bold text-slate-500 flex-shrink-0">Contexto:</span>
+          <button onclick="setChatContext('bio')" id="ctx-bio" class="ctx-btn flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-apoio1/10 text-apoio1 border-2 border-apoio1 flex-shrink-0 transition">🧬 Biologia</button>
+          <button onclick="setChatContext('mat')" id="ctx-mat" class="ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-apoio3">📐 Matemática</button>
+          <button onclick="setChatContext('qui')" id="ctx-qui" class="ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-apoio2">⚗️ Química</button>
+          <button onclick="setChatContext('his')" id="ctx-his" class="ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-primary">📜 História</button>
+          <button onclick="setChatContext('fis')" id="ctx-fis" class="ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-apoio1">⚡ Física</button>
+          <div class="flex-1"></div>
+          <button onclick="newChat()" class="text-xs text-slate-500 border border-slate-200 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition font-medium flex-shrink-0">+ Nova conversa</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-fundo" id="chat-messages">
+          <!-- Welcome -->
+          <div class="flex gap-3 max-w-2xl">
+            <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+            </div>
+            <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-100 shadow-sm">
+              <p class="text-sm text-slate-700">Olá, João! 👋 Sou a IA do EstudAI. Baseio minhas respostas <strong>exclusivamente no seu livro didático</strong>, com referências exatas de página e capítulo. Selecione a matéria acima e me faça uma pergunta!</p>
+            </div>
+          </div>
+          <!-- User message -->
+          <div class="flex gap-3 max-w-2xl ml-auto flex-row-reverse">
+            <div class="w-8 h-8 rounded-full xp-gradient flex items-center justify-center text-white text-xs font-bold flex-shrink-0">JS</div>
+            <div class="bg-white rounded-2xl rounded-tr-sm px-4 py-3 border border-primary/20 shadow-sm">
+              <p class="text-sm text-dark">Me explica o que é mitose e como ela difere da meiose</p>
+            </div>
+          </div>
+          <!-- AI response -->
+          <div class="flex gap-3 max-w-2xl">
+            <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+            </div>
+            <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-100 shadow-sm space-y-2">
+              <p class="text-sm text-slate-700"><strong>Mitose</strong> é o processo de divisão celular que resulta em duas células filhas geneticamente idênticas à célula mãe, mantendo o número diploide de cromossomos (2n).</p>
+              <p class="text-sm text-slate-700">Já a <strong>meiose</strong> gera quatro células filhas haploides (n), com metade dos cromossomos, sendo essencial para a formação de gametas.</p>
+              <div class="flex flex-wrap gap-1.5 mt-1">
+                <span class="inline-flex items-center gap-1 text-xs bg-apoio1/10 text-apoio1 border border-apoio1/20 px-2 py-0.5 rounded-full cursor-pointer hover:bg-apoio1/20 transition font-medium">📖 Bio. Celular · p.87–90</span>
+                <span class="inline-flex items-center gap-1 text-xs bg-apoio1/10 text-apoio1 border border-apoio1/20 px-2 py-0.5 rounded-full cursor-pointer hover:bg-apoio1/20 transition font-medium">📖 Cap.5 · p.102</span>
+              </div>
+              <div class="flex gap-3 pt-1 border-t border-slate-100 mt-1">
+                <button onclick="navigate('resumos')" class="text-xs text-slate-400 hover:text-apoio3 transition flex items-center gap-1 font-medium">📝 Gerar resumo</button>
+                <button onclick="navigate('podcasts')" class="text-xs text-slate-400 hover:text-apoio3 transition flex items-center gap-1 font-medium">🎙️ Criar podcast</button>
+                <button onclick="navigate('simulados')" class="text-xs text-slate-400 hover:text-apoio3 transition flex items-center gap-1 font-medium">📋 Montar simulado</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing indicator (hidden by default) -->
+        <div id="typing-indicator" class="hidden px-4 pb-2">
+          <div class="flex gap-3 max-w-2xl">
+            <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+            </div>
+            <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-100 shadow-sm flex items-center gap-1.5">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="bg-white border-t border-slate-200 px-4 py-3 flex-shrink-0">
+          <div class="flex gap-2 items-end">
+            <div class="flex-1 bg-slate-100 rounded-2xl px-4 py-2.5 min-h-[44px] flex items-center">
+              <input type="text" id="chat-input" placeholder="Pergunte algo sobre o seu livro..." class="w-full bg-transparent text-sm focus:outline-none" onkeydown="if(event.key==='Enter')sendMessage()" />
+            </div>
+            <button onclick="sendMessage()" class="w-10 h-10 xp-gradient rounded-xl flex items-center justify-center text-white hover:opacity-90 transition flex-shrink-0 shadow-md shadow-primary/30">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+          </div>
+          <p class="text-center text-[10px] text-slate-400 mt-1.5 font-medium">Respostas baseadas no livro oficial · sempre com referência de página</p>
+        </div>
+      </div>
+
+      <!-- ── RESUMOS ── -->
+      <div id="page-resumos" class="page p-4 lg:p-6 space-y-5">
+        <div class="flex items-center justify-between">
+          <div><h2 class="text-xl font-extrabold">Resumos</h2><p class="text-sm text-slate-500">Gerados por IA com base nos seus livros</p></div>
+          <button onclick="openGenerateModal('resumo')" class="xp-gradient text-white text-sm font-bold px-4 py-2 rounded-xl hover:opacity-90 transition shadow-md shadow-primary/30">+ Novo resumo</button>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-white rounded-xl border border-slate-100 p-4 card-hover cursor-pointer">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-apoio1 bg-apoio1/10 px-2 py-0.5 rounded-full">Biologia</span>
+              <span class="text-xs text-slate-400">há 2h</span>
+            </div>
+            <h4 class="font-bold text-sm">Mitose e Meiose</h4>
+            <p class="text-xs text-slate-500 mt-1 line-clamp-2">Divisão celular mitótica e meiótica: diferenças, etapas e importância biológica...</p>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+              <span class="text-xs text-slate-400 font-medium">📖 p.87–102</span>
+              <div class="ml-auto flex gap-2">
+                <button class="text-xs text-apoio3 hover:underline font-medium">Editar</button>
+                <button class="text-xs text-primary hover:underline font-medium">Publicar</button>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4 card-hover cursor-pointer">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-apoio3 bg-apoio3/10 px-2 py-0.5 rounded-full">Matemática</span>
+              <span class="text-xs text-slate-400">ontem</span>
+            </div>
+            <h4 class="font-bold text-sm">Funções do 2º Grau</h4>
+            <p class="text-xs text-slate-500 mt-1 line-clamp-2">Definição, vértice, discriminante e análise gráfica da parábola...</p>
+            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+              <span class="text-xs text-slate-400 font-medium">📖 p.45–60</span>
+              <div class="ml-auto flex gap-2">
+                <button class="text-xs text-apoio3 hover:underline font-medium">Editar</button>
+                <span class="text-xs text-apoio2 font-bold">✓ Publicado</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border-2 border-dashed border-slate-200 p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition min-h-[140px]" onclick="openGenerateModal('resumo')">
+            <span class="text-3xl mb-2">✨</span>
+            <p class="text-sm font-bold text-slate-600">Gerar novo resumo</p>
+            <p class="text-xs text-slate-400 mt-0.5">Escolha um capítulo do livro</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PODCASTS ── -->
+      <div id="page-podcasts" class="page p-4 lg:p-6 space-y-5">
+        <div class="flex items-center justify-between">
+          <div><h2 class="text-xl font-extrabold">Podcasts</h2><p class="text-sm text-slate-500">Ouça seu conteúdo em áudio gerado por IA</p></div>
+          <button onclick="openGenerateModal('podcast')" class="xp-gradient text-white text-sm font-bold px-4 py-2 rounded-xl hover:opacity-90 transition shadow-md shadow-primary/30">+ Gerar podcast</button>
+        </div>
+
+        <!-- Player -->
+        <div class="bg-gradient-to-r from-dark to-dark-2 rounded-2xl p-5 text-white" id="podcast-player">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">🎙️</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs text-slate-400 mb-0.5">Reproduzindo agora</p>
+              <h3 class="font-bold text-base leading-tight">Revolução Industrial: causas e consequências</h3>
+              <p class="text-xs text-slate-400 mt-0.5">História · 8m 24s · 📖 p.120–135</p>
+            </div>
+            <!-- Wave animation when playing -->
+            <div class="flex items-center gap-0.5 flex-shrink-0" id="wave-container" style="display:none!important">
+              <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-400 font-mono w-10" id="pod-current">2:15</span>
+            <div class="flex-1 bg-white/15 rounded-full h-1.5 relative cursor-pointer" onclick="seekPodcast(event)" id="pod-track">
+              <div class="bg-primary h-1.5 rounded-full transition-all" style="width: 27%" id="pod-progress"></div>
+              <div class="absolute w-3.5 h-3.5 bg-white rounded-full top-1/2 -translate-y-1/2 shadow-md transition-all" style="left: calc(27% - 7px)" id="pod-thumb"></div>
+            </div>
+            <span class="text-xs text-slate-400 font-mono w-10 text-right">8:24</span>
+          </div>
+          <div class="mt-4 flex items-center justify-center gap-5">
+            <button class="text-slate-400 hover:text-white transition text-lg">⏮</button>
+            <button onclick="togglePodcast()" id="pod-play-btn" class="w-12 h-12 xp-gradient rounded-full flex items-center justify-center text-white hover:opacity-90 transition text-xl shadow-lg shadow-primary/30">▶</button>
+            <button class="text-slate-400 hover:text-white transition text-lg">⏭</button>
+            <button class="text-xs text-slate-400 hover:text-white transition ml-4 font-medium">1×</button>
+          </div>
+        </div>
+
+        <!-- List -->
+        <div class="space-y-2">
+          <div class="bg-white rounded-xl border border-slate-100 p-3.5 flex items-center gap-3 card-hover cursor-pointer">
+            <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🎙️</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold truncate">Revolução Industrial</p>
+              <p class="text-xs text-slate-400 font-medium">História · 8m 24s · 📖 p.120–135</p>
+            </div>
+            <button onclick="togglePodcast()" class="w-9 h-9 xp-gradient rounded-full flex items-center justify-center text-white hover:opacity-90 transition text-sm shadow-md shadow-primary/25">▶</button>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-3.5 flex items-center gap-3 card-hover cursor-pointer">
+            <div class="w-10 h-10 bg-apoio2/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🎙️</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold truncate">Funções Orgânicas</p>
+              <p class="text-xs text-slate-400 font-medium">Química · 6m 10s · 📖 p.78–92</p>
+            </div>
+            <button class="w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition text-sm">▶</button>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-3.5 flex items-center gap-3 card-hover cursor-pointer">
+            <div class="w-10 h-10 bg-apoio1/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">🎙️</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold truncate">Mitose vs. Meiose</p>
+              <p class="text-xs text-slate-400 font-medium">Biologia · 5m 48s · 📖 p.87–102</p>
+            </div>
+            <button class="w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition text-sm">▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SIMULADOS ── -->
+      <div id="page-simulados" class="page p-4 lg:p-6 space-y-5">
+        <!-- List view (default) -->
+        <div id="quiz-list-view">
+          <div class="flex items-center justify-between mb-5">
+            <div><h2 class="text-xl font-extrabold">Simulados</h2><p class="text-sm text-slate-500">Teste seu conhecimento com questões do livro</p></div>
+            <button onclick="openGenerateModal('simulado')" class="xp-gradient text-white text-sm font-bold px-4 py-2 rounded-xl hover:opacity-90 transition shadow-md shadow-primary/30">+ Novo simulado</button>
+          </div>
+          <div class="grid grid-cols-3 gap-3 mb-5">
+            <div class="bg-white rounded-xl border border-slate-100 p-3 text-center">
+              <p class="text-xl font-extrabold text-apoio2">85%</p><p class="text-xs text-slate-500 font-medium">Média geral</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-100 p-3 text-center">
+              <p class="text-xl font-extrabold text-apoio1">8</p><p class="text-xs text-slate-500 font-medium">Simulados feitos</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-100 p-3 text-center">
+              <p class="text-xl font-extrabold text-apoio3">142</p><p class="text-xs text-slate-500 font-medium">Questões respondidas</p>
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="bg-white rounded-xl border border-slate-100 p-4 card-hover">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-2xl">🧬</span>
+                <div>
+                  <p class="text-sm font-bold">Biologia · Divisão Celular</p>
+                  <p class="text-xs text-slate-400">15 questões · 20 min · 📖 Cap.5</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs mb-2">
+                <span class="text-slate-500 font-medium">Melhor resultado: <strong class="text-apoio2">90%</strong></span>
+                <span class="text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full">Completado</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5 mb-3"><div class="bg-apoio2 h-1.5 rounded-full" style="width: 90%"></div></div>
+              <button onclick="startQuiz()" class="w-full py-2 border-2 border-primary text-primary text-xs font-bold rounded-xl hover:bg-primary hover:text-white transition">Refazer simulado →</button>
+            </div>
+            <div class="bg-white rounded-xl border-2 border-dashed border-slate-200 p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition min-h-[160px]" onclick="openGenerateModal('simulado')">
+              <span class="text-3xl mb-2">🎯</span>
+              <p class="text-sm font-bold text-slate-600">Criar novo simulado</p>
+              <p class="text-xs text-slate-400 mt-0.5">Escolha matéria e capítulos</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz active view (hidden) -->
+        <div id="quiz-active-view" class="hidden">
+          <!-- Header -->
+          <div class="bg-white rounded-2xl border border-slate-100 p-4 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <p class="text-xs text-slate-400 font-medium">Biologia · Divisão Celular</p>
+                <p class="text-sm font-bold">Questão <span id="q-current">1</span> de <span id="q-total">5</span></p>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-apoio2/10 text-apoio2 rounded-xl flex items-center justify-center text-xs font-extrabold" id="quiz-score-badge">0</div>
+                <button onclick="exitQuiz()" class="text-xs text-slate-400 border border-slate-200 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition font-medium">Sair</button>
+              </div>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-1.5">
+              <div class="bg-primary h-1.5 rounded-full transition-all" id="quiz-progress-bar" style="width:20%"></div>
+            </div>
+          </div>
+          <!-- Question card -->
+          <div class="bg-white rounded-2xl border border-slate-100 p-5">
+            <p class="text-sm font-bold mb-4" id="quiz-question">Qual é a principal diferença entre mitose e meiose em relação ao número de células filhas produzidas?</p>
+            <div class="space-y-2.5" id="quiz-options">
+              <button onclick="answerQuiz(this,false)" class="quiz-option w-full text-left px-4 py-3 rounded-xl border-2 border-slate-200 text-sm font-medium transition">A) Mitose produz 2; meiose produz 2</button>
+              <button onclick="answerQuiz(this,true)" class="quiz-option w-full text-left px-4 py-3 rounded-xl border-2 border-slate-200 text-sm font-medium transition">B) Mitose produz 2; meiose produz 4</button>
+              <button onclick="answerQuiz(this,false)" class="quiz-option w-full text-left px-4 py-3 rounded-xl border-2 border-slate-200 text-sm font-medium transition">C) Mitose produz 4; meiose produz 2</button>
+              <button onclick="answerQuiz(this,false)" class="quiz-option w-full text-left px-4 py-3 rounded-xl border-2 border-slate-200 text-sm font-medium transition">D) Ambas produzem 4 células filhas</button>
+            </div>
+            <div id="quiz-feedback" class="hidden mt-4 p-3 rounded-xl text-sm font-medium"></div>
+            <div class="mt-4 flex items-center gap-2">
+              <span class="text-xs text-slate-400 font-medium">📖 Bio. Celular · p.87</span>
+              <button onclick="nextQuestion()" id="quiz-next-btn" class="hidden ml-auto xp-gradient text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md shadow-primary/25">Próxima →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz result view (hidden) -->
+        <div id="quiz-result-view" class="hidden text-center">
+          <div class="bg-white rounded-2xl border border-slate-100 p-8">
+            <div class="text-6xl mb-4" id="result-emoji">🏆</div>
+            <h3 class="text-2xl font-extrabold mb-1" id="result-score">4/5 corretas</h3>
+            <p class="text-slate-500 text-sm mb-2" id="result-pct">80% de acerto</p>
+            <p class="text-xs text-apoio2 font-bold mb-6" id="result-xp">+100 XP ganhos!</p>
+            <div class="flex gap-3 justify-center">
+              <button onclick="exitQuiz()" class="px-5 py-2.5 border-2 border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition">Ver resultados</button>
+              <button onclick="startQuiz()" class="px-5 py-2.5 xp-gradient text-white text-sm font-bold rounded-xl hover:opacity-90 transition shadow-md shadow-primary/25">Tentar novamente</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── GAMES ── -->
+      <div id="page-games" class="page p-4 lg:p-6 space-y-5">
+        <div class="flex items-center justify-between">
+          <div><h2 class="text-xl font-extrabold">Games</h2><p class="text-sm text-slate-500">Estude jogando e ganhe XP</p></div>
+        </div>
+
+        <!-- Flashcard demo (active) -->
+        <div id="flashcard-game" class="hidden">
+          <div class="flex items-center gap-3 mb-4">
+            <button onclick="closeGame()" class="text-xs text-slate-400 border border-slate-200 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition font-medium">← Voltar</button>
+            <p class="text-sm font-bold">Flashcards · Biologia</p>
+            <span class="ml-auto text-xs font-bold text-slate-400">1 / 8</span>
+          </div>
+          <div class="flashcard-scene h-56 mb-4" id="flashcard-el" onclick="flipCard()">
+            <div class="flashcard-inner">
+              <div class="flashcard-front bg-gradient-to-br from-apoio1 to-apoio3">
+                <div class="text-center text-white">
+                  <p class="text-xs font-bold uppercase tracking-widest mb-2 opacity-70">Pergunta</p>
+                  <p class="text-lg font-bold">O que é mitose?</p>
+                  <p class="text-xs mt-3 opacity-60">Toque para revelar</p>
+                </div>
+              </div>
+              <div class="flashcard-back bg-white border-2 border-apoio1/20">
+                <div class="text-center">
+                  <p class="text-xs font-bold uppercase tracking-widest mb-2 text-apoio1">Resposta</p>
+                  <p class="text-sm font-bold text-dark">Divisão celular que resulta em 2 células filhas geneticamente idênticas à célula mãe (2n → 2n).</p>
+                  <p class="text-xs mt-3 text-slate-400">📖 Bio. Celular · p.87</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button class="flex-1 py-3 rounded-xl border-2 border-red-200 text-red-500 text-sm font-bold hover:bg-red-50 transition">😕 Não soube</button>
+            <button class="flex-1 py-3 rounded-xl border-2 border-apoio2/40 text-apoio2 text-sm font-bold hover:bg-apoio2/5 transition">✓ Sabia!</button>
+          </div>
+        </div>
+
+        <!-- Game selection -->
+        <div id="game-selection">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-2xl border border-slate-100 p-5 text-center card-hover cursor-pointer group" onclick="openGame('flashcard')">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🃏</div>
+              <h4 class="font-extrabold text-sm">Flashcards</h4>
+              <p class="text-xs text-slate-500 mt-1">Memorização ativa</p>
+              <span class="mt-2 inline-block text-xs font-bold text-apoio1 bg-apoio1/10 px-2 py-0.5 rounded-full">Solo</span>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-100 p-5 text-center card-hover cursor-pointer group">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">⚔️</div>
+              <h4 class="font-extrabold text-sm">Quiz Battle</h4>
+              <p class="text-xs text-slate-500 mt-1">Desafie um colega</p>
+              <span class="mt-2 inline-block text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Multiplayer</span>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-100 p-5 text-center card-hover cursor-pointer group">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🔍</div>
+              <h4 class="font-extrabold text-sm">Caça-Palavras</h4>
+              <p class="text-xs text-slate-500 mt-1">Termos do capítulo</p>
+              <span class="mt-2 inline-block text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full">Solo</span>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-100 p-5 text-center card-hover cursor-pointer group">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">✏️</div>
+              <h4 class="font-extrabold text-sm">Cruzadinha</h4>
+              <p class="text-xs text-slate-500 mt-1">Palavras-cruzadas</p>
+              <span class="mt-2 inline-block text-xs font-bold text-apoio3 bg-apoio3/10 px-2 py-0.5 rounded-full">Solo</span>
+            </div>
+          </div>
+
+          <!-- Ranking -->
+          <div class="bg-white rounded-xl border border-slate-100 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-sm">🏅 Ranking da Turma · 3º Ano A</h3>
+              <button class="text-xs text-primary font-semibold">Ver completo</button>
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center gap-3 p-2.5 rounded-xl bg-yellow-50 border border-yellow-100">
+                <span class="text-lg">🥇</span>
+                <div class="w-7 h-7 rounded-full bg-yellow-400 flex items-center justify-center text-white text-xs font-extrabold">AM</div>
+                <span class="text-sm font-bold flex-1">Ana Martins</span>
+                <span class="text-sm font-extrabold text-yellow-600">2.840 XP</span>
+              </div>
+              <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                <span class="text-lg">🥈</span>
+                <div class="w-7 h-7 rounded-full xp-gradient flex items-center justify-center text-white text-xs font-extrabold">JS</div>
+                <span class="text-sm font-bold flex-1">João Silva <span class="text-xs text-slate-400 font-normal">(você)</span></span>
+                <span class="text-sm font-extrabold text-slate-600">1.240 XP</span>
+              </div>
+              <div class="flex items-center gap-3 p-2.5 rounded-xl">
+                <span class="text-lg">🥉</span>
+                <div class="w-7 h-7 rounded-full bg-orange-400 flex items-center justify-center text-white text-xs font-extrabold">PO</div>
+                <span class="text-sm font-bold flex-1">Pedro Oliveira</span>
+                <span class="text-sm font-extrabold text-orange-600">1.100 XP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REDE SOCIAL ── -->
+      <div id="page-rede" class="page p-4 lg:p-6 space-y-4">
+        <div>
+          <h2 class="text-xl font-extrabold">Rede da Turma</h2>
+          <p class="text-sm text-slate-500">Compartilhe resumos e conquistas com sua turma · 3º Ano A</p>
+        </div>
+        <!-- Composer -->
+        <div class="bg-white rounded-xl border border-slate-100 p-4">
+          <div class="flex gap-3">
+            <div class="w-9 h-9 rounded-full xp-gradient flex items-center justify-center text-white font-bold text-sm flex-shrink-0">JS</div>
+            <div class="flex-1">
+              <div class="bg-slate-100 rounded-xl px-3 py-2.5 text-sm text-slate-400 cursor-pointer hover:bg-slate-200 transition mb-2">Compartilhe um resumo, simulado ou conquista...</div>
+              <div class="flex gap-2">
+                <button class="text-xs text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition font-medium">📝 Resumo</button>
+                <button class="text-xs text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition font-medium">📋 Resultado</button>
+                <button class="text-xs text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition font-medium">🏆 Conquista</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Post -->
+        <div class="bg-white rounded-xl border border-slate-100 p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-full bg-apoio2 flex items-center justify-center text-white font-bold text-sm">AM</div>
+            <div>
+              <p class="text-sm font-bold">Ana Martins</p>
+              <p class="text-xs text-slate-400">há 1 hora · 📝 Compartilhou um resumo</p>
+            </div>
+            <div class="ml-auto bg-apoio2/10 text-apoio2 text-xs font-bold px-2 py-0.5 rounded-full">Destaque ⭐</div>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3 cursor-pointer hover:border-apoio1/30 transition" onclick="navigate('resumos')">
+            <p class="text-xs font-bold text-apoio1 mb-1">📝 Resumo: Fotossíntese</p>
+            <p class="text-xs text-slate-600 line-clamp-3">A fotossíntese é o processo pelo qual plantas, algas e algumas bactérias convertem luz solar em energia química...</p>
+            <p class="text-xs text-slate-400 mt-1.5 font-medium">📖 Bio. Celular · p.67–75</p>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-slate-400">
+            <button onclick="this.textContent=this.textContent.includes('12')?'❤️ 13':'❤️ 12'" class="flex items-center gap-1 hover:text-primary transition font-medium">❤️ 12</button>
+            <button class="flex items-center gap-1 hover:text-apoio1 transition font-medium">💬 3</button>
+            <button class="flex items-center gap-1 hover:text-apoio3 transition font-medium">🔖 Salvar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CONQUISTAS ── -->
+      <div id="page-conquistas" class="page p-4 lg:p-6 space-y-5">
+        <div><h2 class="text-xl font-extrabold">Conquistas</h2><p class="text-sm text-slate-500">Seu progresso gamificado</p></div>
+        <div class="bg-gradient-to-r from-apoio3 to-apoio1 rounded-2xl p-5 text-white flex items-center gap-4">
+          <div class="text-5xl">🏆</div>
+          <div>
+            <p class="text-sm opacity-80 font-medium">Nível atual</p>
+            <p class="text-3xl font-extrabold">Nível 8</p>
+            <p class="text-sm opacity-80 font-medium">1.240 / 1.500 XP</p>
+          </div>
+          <div class="ml-auto text-right hidden sm:block">
+            <p class="text-sm opacity-80 font-medium">Conquistas</p>
+            <p class="text-2xl font-extrabold">14 / 42</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div class="bg-white rounded-xl border border-slate-100 p-3 text-center card-hover">
+            <div class="text-3xl mb-1">🎯</div>
+            <p class="text-xs font-extrabold">Certeiro</p>
+            <p class="text-[10px] text-apoio2 mt-0.5 font-bold">+100 XP</p>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-3 text-center card-hover">
+            <div class="text-3xl mb-1">🔥</div>
+            <p class="text-xs font-extrabold">7 dias</p>
+            <p class="text-[10px] text-apoio2 mt-0.5 font-bold">+150 XP</p>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-3 text-center card-hover">
+            <div class="text-3xl mb-1">📚</div>
+            <p class="text-xs font-extrabold">Leitor</p>
+            <p class="text-[10px] text-apoio2 mt-0.5 font-bold">+200 XP</p>
+          </div>
+          <div class="bg-white rounded-xl border-2 border-dashed border-slate-200 p-3 text-center opacity-50">
+            <div class="text-3xl mb-1 grayscale">🎙️</div>
+            <p class="text-xs font-extrabold text-slate-400">Podcaster</p>
+            <p class="text-[10px] text-slate-300 mt-0.5 font-bold">Gere 5 podcasts</p>
+          </div>
+          <div class="bg-white rounded-xl border-2 border-dashed border-slate-200 p-3 text-center opacity-50">
+            <div class="text-3xl mb-1 grayscale">⚔️</div>
+            <p class="text-xs font-extrabold text-slate-400">Guerreiro</p>
+            <p class="text-[10px] text-slate-300 mt-0.5 font-bold">Vença 10 batalhas</p>
+          </div>
+          <div class="bg-white rounded-xl border-2 border-dashed border-slate-200 p-3 text-center opacity-50">
+            <div class="text-3xl mb-1 grayscale">🌟</div>
+            <p class="text-xs font-extrabold text-slate-400">Estrela</p>
+            <p class="text-[10px] text-slate-300 mt-0.5 font-bold">Nível 10</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CONFIG ── -->
+      <div id="page-config" class="page p-4 lg:p-6 space-y-5">
+        <div><h2 class="text-xl font-extrabold">Configurações</h2></div>
+        <div class="max-w-lg space-y-4">
+          <div class="bg-white rounded-xl border border-slate-100 p-5">
+            <h3 class="font-bold text-sm mb-4">Perfil</h3>
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 rounded-full xp-gradient flex items-center justify-center text-white font-extrabold text-xl">JS</div>
+              <button class="text-xs text-apoio1 border border-apoio1/30 px-3 py-1.5 rounded-xl hover:bg-apoio1/5 transition font-medium">Alterar foto</button>
+            </div>
+            <div class="space-y-3">
+              <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Nome completo</label>
+                <input value="João Silva" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25 font-medium" /></div>
+              <div><label class="block text-xs font-bold text-slate-600 mb-1.5">E-mail</label>
+                <input value="joao@escola.edu.br" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25" /></div>
+              <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Turma</label>
+                <input value="3º Ano A" disabled class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-400" /></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-5">
+            <h3 class="font-bold text-sm mb-4">Notificações</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium">Lembrete diário de estudos</p>
+                <div class="w-11 h-6 bg-apoio2 rounded-full relative cursor-pointer" onclick="toggleSwitch(this)"><div class="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all"></div></div>
+              </div>
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium">Novas conquistas</p>
+                <div class="w-11 h-6 bg-apoio2 rounded-full relative cursor-pointer" onclick="toggleSwitch(this)"><div class="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all"></div></div>
+              </div>
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium">Atividades da turma</p>
+                <div class="w-11 h-6 bg-slate-200 rounded-full relative cursor-pointer" onclick="toggleSwitch(this)"><div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-100 p-5">
+            <h3 class="font-bold text-sm mb-4">Privacidade</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium">Perfil visível na turma</p>
+                  <p class="text-xs text-slate-400">Outros alunos podem ver seu progresso</p>
+                </div>
+                <div class="w-11 h-6 bg-apoio2 rounded-full relative cursor-pointer" onclick="toggleSwitch(this)"><div class="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all"></div></div>
+              </div>
+            </div>
+          </div>
+          <button class="w-full py-3 xp-gradient text-white font-bold rounded-xl hover:opacity-90 transition text-sm shadow-md shadow-primary/30">Salvar alterações</button>
+        </div>
+      </div>
+
+      <!-- ── PROFESSOR ── -->
+      <div id="page-professor" class="page p-4 lg:p-6 space-y-5">
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-10 h-10 bg-apoio1/10 rounded-xl flex items-center justify-center text-xl">👩‍🏫</div>
+          <div><h2 class="text-xl font-extrabold">Painel do Professor</h2><p class="text-sm text-slate-500">Escola Municipal · 3º Ano A · Biologia</p></div>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio1">32</p><p class="text-xs text-slate-500 font-medium">Alunos ativos</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio2">78%</p><p class="text-xs text-slate-500 font-medium">Engajamento médio</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio3">156</p><p class="text-xs text-slate-500 font-medium">Resumos gerados</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-primary">84%</p><p class="text-xs text-slate-500 font-medium">Média simulados</p></div>
+        </div>
+        <!-- Alerts -->
+        <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-start gap-3">
+          <span class="text-lg flex-shrink-0">⚠️</span>
+          <div>
+            <p class="text-sm font-bold text-orange-800">3 alunos em risco de evasão</p>
+            <p class="text-xs text-orange-600 mt-0.5">Engajamento abaixo de 30% nos últimos 7 dias: Carlos S., Maria L., Beatriz F.</p>
+          </div>
+          <button class="ml-auto text-xs font-bold text-orange-600 border border-orange-300 px-3 py-1.5 rounded-xl hover:bg-orange-100 transition flex-shrink-0">Contatar</button>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-100 p-4">
+          <h3 class="font-bold text-sm mb-3">Engajamento dos Alunos</h3>
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-full bg-apoio2 flex items-center justify-center text-white text-xs font-bold">AM</div>
+              <span class="text-sm font-medium flex-1">Ana Martins</span>
+              <div class="w-28 bg-slate-100 rounded-full h-2"><div class="bg-apoio2 h-2 rounded-full" style="width:95%"></div></div>
+              <span class="text-xs text-slate-500 w-8 text-right font-bold">95%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-full xp-gradient flex items-center justify-center text-white text-xs font-bold">JS</div>
+              <span class="text-sm font-medium flex-1">João Silva</span>
+              <div class="w-28 bg-slate-100 rounded-full h-2"><div class="bg-primary h-2 rounded-full" style="width:82%"></div></div>
+              <span class="text-xs text-slate-500 w-8 text-right font-bold">82%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-full bg-apoio3 flex items-center justify-center text-white text-xs font-bold">PO</div>
+              <span class="text-sm font-medium flex-1">Pedro Oliveira</span>
+              <div class="w-28 bg-slate-100 rounded-full h-2"><div class="bg-apoio3 h-2 rounded-full" style="width:70%"></div></div>
+              <span class="text-xs text-slate-500 w-8 text-right font-bold">70%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-full bg-red-400 flex items-center justify-center text-white text-xs font-bold">CS</div>
+              <span class="text-sm font-medium flex-1 text-red-500">Carlos Santos ⚠️</span>
+              <div class="w-28 bg-slate-100 rounded-full h-2"><div class="bg-red-400 h-2 rounded-full" style="width:22%"></div></div>
+              <span class="text-xs text-red-500 w-8 text-right font-bold">22%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DIRETOR ── -->
+      <div id="page-diretor" class="page p-4 lg:p-6 space-y-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-apoio2/10 rounded-xl flex items-center justify-center text-xl">🏫</div>
+          <div><h2 class="text-xl font-extrabold">Painel do Diretor</h2><p class="text-sm text-slate-500">Escola Municipal São Paulo</p></div>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio1">12</p><p class="text-xs text-slate-500 font-medium">Turmas ativas</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio2">387</p><p class="text-xs text-slate-500 font-medium">Alunos totais</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio3">72%</p><p class="text-xs text-slate-500 font-medium">Eng. médio</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-primary">4.2%</p><p class="text-xs text-slate-500 font-medium">Risco evasão</p></div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-100 p-4">
+          <h3 class="font-bold text-sm mb-3">Engajamento por Turma</h3>
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-3"><span class="text-xs text-slate-600 w-20 font-medium">3º Ano A</span><div class="flex-1 bg-slate-100 rounded-full h-2"><div class="bg-apoio2 h-2 rounded-full" style="width:78%"></div></div><span class="text-xs font-bold text-slate-500 w-8 text-right">78%</span></div>
+            <div class="flex items-center gap-3"><span class="text-xs text-slate-600 w-20 font-medium">3º Ano B</span><div class="flex-1 bg-slate-100 rounded-full h-2"><div class="bg-apoio1 h-2 rounded-full" style="width:65%"></div></div><span class="text-xs font-bold text-slate-500 w-8 text-right">65%</span></div>
+            <div class="flex items-center gap-3"><span class="text-xs text-slate-600 w-20 font-medium">2º Ano A</span><div class="flex-1 bg-slate-100 rounded-full h-2"><div class="bg-apoio3 h-2 rounded-full" style="width:82%"></div></div><span class="text-xs font-bold text-slate-500 w-8 text-right">82%</span></div>
+            <div class="flex items-center gap-3"><span class="text-xs text-red-500 w-20 font-medium">1º Ano C ⚠️</span><div class="flex-1 bg-slate-100 rounded-full h-2"><div class="bg-red-400 h-2 rounded-full" style="width:38%"></div></div><span class="text-xs font-bold text-red-500 w-8 text-right">38%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── GESTOR ── -->
+      <div id="page-gestor" class="page p-4 lg:p-6 space-y-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-apoio3/10 rounded-xl flex items-center justify-center text-xl">🗂️</div>
+          <div><h2 class="text-xl font-extrabold">Painel do Gestor de Rede</h2><p class="text-sm text-slate-500">Rede Municipal de Ensino — SP</p></div>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio1">8</p><p class="text-xs text-slate-500 font-medium">Escolas</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio2">2.840</p><p class="text-xs text-slate-500 font-medium">Alunos totais</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-apoio3">74%</p><p class="text-xs text-slate-500 font-medium">Eng. médio</p></div>
+          <div class="bg-white rounded-xl border border-slate-100 p-4"><p class="text-2xl font-extrabold text-primary">3.1%</p><p class="text-xs text-slate-500 font-medium">Risco evasão</p></div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-100 p-4">
+          <h3 class="font-bold text-sm mb-3">Engajamento por Escola</h3>
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-3"><span class="text-xs text-slate-600 w-36 truncate font-medium">E.M. Santos Dumont</span><div class="flex-1 bg-slate-100 rounded-full h-2"><div class="bg-apoio2 h-2 rounded-full" style="width:82%"></div></div><span class="text-xs font-bold text-slate-500 w-8 text-right">82%</span></div>
+            <div class="flex items-center gap-3"><span class="text-xs text-slate-600 w-36 truncate font-medium">E.M. Monteiro Lobato</span><div class="flex-1 bg-slate-100 rounded-full h-2"><div class="bg-apoio1 h-2 rounded-full" style="width:70%"></div></div><span class="text-xs font-bold text-slate-500 w-8 text-right">70%</span></div>
+            <div class="flex items-center gap-3"><span class="text-xs text-red-500 w-36 truncate font-medium">E.M. Rui Barbosa ⚠️</span><div class="flex-1 bg-slate-100 rounded-full h-2"><div class="bg-red-400 h-2 rounded-full" style="width:41%"></div></div><span class="text-xs font-bold text-red-500 w-8 text-right">41%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ADMIN LIVROS ── -->
+      <div id="page-biblioteca-admin" class="page p-4 lg:p-6 space-y-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-apoio1/10 rounded-xl flex items-center justify-center text-xl">📥</div>
+          <div><h2 class="text-xl font-extrabold">Gestão de Livros</h2><p class="text-sm text-slate-500">Upload e ingestão de PDFs — visível apenas para professores e administradores</p></div>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl border border-slate-100 p-6 space-y-5">
+            <h3 class="font-bold text-sm">Adicionar novo livro</h3>
+            <div id="drop-zone" class="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all" onclick="document.getElementById('pdf-input').click()" ondragover="event.preventDefault();this.classList.add('border-primary','bg-primary/5')" ondragleave="this.classList.remove('border-primary','bg-primary/5')" ondrop="handleDrop(event)">
+              <div class="text-4xl mb-3">📄</div>
+              <p class="text-sm font-bold text-slate-600">Arraste o PDF aqui ou clique para selecionar</p>
+              <p class="text-xs text-slate-400 mt-1">Máx. 100 MB · somente PDF</p>
+              <input type="file" id="pdf-input" accept=".pdf" class="hidden" onchange="handleFileSelect(event)" />
+            </div>
+            <div id="file-selected" class="hidden bg-slate-50 rounded-xl p-3 flex items-center gap-3">
+              <div class="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center text-lg">📕</div>
+              <div class="flex-1 min-w-0">
+                <p id="file-name" class="text-sm font-bold truncate">arquivo.pdf</p>
+                <p id="file-size" class="text-xs text-slate-400">—</p>
+              </div>
+              <button onclick="clearFile()" class="text-slate-400 hover:text-red-500 transition text-lg">✕</button>
+            </div>
+            <div class="space-y-3">
+              <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Título do livro <span class="text-primary">*</span></label>
+                <input id="book-title" type="text" placeholder="Ex: Biologia Celular e Molecular, 3ª ed." class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary transition" /></div>
+              <div class="grid grid-cols-2 gap-3">
+                <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Disciplina <span class="text-primary">*</span></label>
+                  <select id="book-subject" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25 bg-white">
+                    <option value="">Selecionar...</option>
+                    <option value="bio">🧬 Biologia</option>
+                    <option value="mat">📐 Matemática</option>
+                    <option value="fis">⚡ Física</option>
+                    <option value="qui">⚗️ Química</option>
+                    <option value="his">📜 História</option>
+                    <option value="geo">🌍 Geografia</option>
+                    <option value="por">📖 Português</option>
+                    <option value="ing">🇬🇧 Inglês</option>
+                  </select></div>
+                <div><label class="block text-xs font-bold text-slate-600 mb-1.5">Sistema de ensino</label>
+                  <select class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25 bg-white">
+                    <option>Poliedro</option><option>Etapa</option><option>SAS</option><option>PNLD</option><option>Outro</option>
+                  </select></div>
+              </div>
+            </div>
+            <button onclick="startUpload()" class="w-full py-3 xp-gradient hover:opacity-90 text-white font-bold rounded-xl transition text-sm flex items-center justify-center gap-2 shadow-md shadow-primary/30">
+              <span>☁️</span> Upload e Iniciar Ingestão
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <h3 class="font-bold text-sm">Status da ingestão</h3>
+            <div class="bg-white rounded-xl border border-slate-100 p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 bg-yellow-100 rounded-xl flex items-center justify-center text-lg flex-shrink-0">⏳</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-bold truncate">Biologia Celular e Molecular</p>
+                    <span class="text-xs font-bold text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded-full ml-2 flex-shrink-0">Processando</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-0.5">Biologia · 247 páginas</p>
+                  <div class="mt-2.5 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="text-slate-500 font-medium">Gerando embeddings...</span>
+                      <span class="font-bold text-slate-500">142 / 247 chunks</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5">
+                      <div class="bg-yellow-400 h-1.5 rounded-full" id="ingest-progress" style="width:57%"></div>
+                    </div>
+                  </div>
+                  <div class="mt-2.5 flex items-center gap-1 text-xs">
+                    <span class="flex items-center gap-1 text-apoio2 font-medium"><span class="w-3.5 h-3.5 bg-apoio2 rounded-full flex items-center justify-center text-white text-[8px]">✓</span> Upload</span>
+                    <span class="text-slate-200 mx-1">─</span>
+                    <span class="flex items-center gap-1 text-apoio2 font-medium"><span class="w-3.5 h-3.5 bg-apoio2 rounded-full flex items-center justify-center text-white text-[8px]">✓</span> Extração</span>
+                    <span class="text-slate-200 mx-1">─</span>
+                    <span class="flex items-center gap-1 text-yellow-600 font-bold"><span class="w-3.5 h-3.5 bg-yellow-400 rounded-full animate-pulse"></span> Embeddings</span>
+                    <span class="text-slate-200 mx-1">─</span>
+                    <span class="text-slate-300 font-medium">Indexação</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-100 p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 bg-apoio2/10 rounded-xl flex items-center justify-center text-lg flex-shrink-0">✅</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <p class="text-sm font-bold truncate">Matemática e suas Tecnologias</p>
+                    <span class="text-xs font-bold text-apoio2 bg-apoio2/10 px-2 py-0.5 rounded-full ml-2 flex-shrink-0">Pronto</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-0.5 font-medium">Matemática · 312 chunks indexados · SAS</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ── MOBILE BOTTOM NAV ── -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex z-30 safe-b">
+      <button onclick="navigate('home')" id="mnav-home" class="mobile-nav-btn active flex-1 flex flex-col items-center py-2">
+        <span class="nav-icon text-xl text-primary">🏠</span>
+        <span class="nav-label text-[9px] font-bold mt-0.5 text-primary">Início</span>
+      </button>
+      <button onclick="navigate('biblioteca')" id="mnav-biblioteca" class="mobile-nav-btn flex-1 flex flex-col items-center py-2">
+        <span class="nav-icon text-xl text-slate-400">📚</span>
+        <span class="nav-label text-[9px] font-medium mt-0.5 text-slate-400">Biblioteca</span>
+      </button>
+      <!-- Chat FAB -->
+      <button onclick="navigate('chat')" id="mnav-chat" class="mobile-nav-btn flex-1 flex flex-col items-center py-1">
+        <div class="w-12 h-12 xp-gradient rounded-2xl flex items-center justify-center -mt-6 shadow-lg shadow-primary/40">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+        </div>
+        <span class="nav-label text-[9px] font-medium mt-0.5 text-slate-400">Chat IA</span>
+      </button>
+      <button onclick="navigate('simulados')" id="mnav-simulados" class="mobile-nav-btn flex-1 flex flex-col items-center py-2">
+        <span class="nav-icon text-xl text-slate-400">📋</span>
+        <span class="nav-label text-[9px] font-medium mt-0.5 text-slate-400">Simulados</span>
+      </button>
+      <button onclick="navigate('games')" id="mnav-games" class="mobile-nav-btn flex-1 flex flex-col items-center py-2">
+        <span class="nav-icon text-xl text-slate-400">🎮</span>
+        <span class="nav-label text-[9px] font-medium mt-0.5 text-slate-400">Games</span>
+      </button>
+    </nav>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     GENERATE MODAL
+══════════════════════════════════════════════════════ -->
+<div id="generate-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end lg:items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+      <p class="font-bold text-sm" id="modal-title">Gerar novo conteúdo</p>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">Matéria</label>
+        <select class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25 bg-white">
+          <option>🧬 Biologia</option><option>📐 Matemática</option><option>⚗️ Química</option><option>📜 História</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">Capítulo</label>
+        <select class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25 bg-white">
+          <option>Cap. 4 · Divisão Celular (p. 87–102)</option>
+          <option>Cap. 5 · Genética Mendeliana (p.103–125)</option>
+          <option>Cap. 6 · Evolução (p.126–148)</option>
+        </select>
+      </div>
+      <div id="modal-extra"></div>
+      <button onclick="closeModal()" class="w-full py-3 xp-gradient hover:opacity-90 text-white font-bold rounded-xl transition text-sm shadow-md shadow-primary/25" id="modal-generate-btn">
+        ✨ Gerar agora
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── State ───────────────────────────────────────────
+  let currentPage = 'home';
+  let currentRole = 'student';
+  let podcastPlaying = false;
+  let podcastInterval = null;
+  let podcastPct = 27;
+  let studySeconds = 872; // 14:32
+  let quizAnswered = false;
+  let quizCurrentQ = 0;
+  let quizCorrect = 0;
+
+  const titles = {
+    home:'Início', biblioteca:'Biblioteca', chat:'Chat IA',
+    resumos:'Resumos', podcasts:'Podcasts', simulados:'Simulados',
+    games:'Games', rede:'Rede da Turma', conquistas:'Conquistas',
+    config:'Configurações', professor:'Painel Professor',
+    diretor:'Painel Diretor', gestor:'Painel Gestor',
+    'biblioteca-admin':'Gestão de Livros',
+  };
+
+  // Role-based nav config
+  const navConfig = {
+    student: [
+      { section: 'Principal', items: [
+        { page:'home', icon:'🏠', label:'Início' },
+        { page:'biblioteca', icon:'📚', label:'Biblioteca' },
+        { page:'chat', icon:'🤖', label:'Chat IA' },
+      ]},
+      { section: 'Estudar', items: [
+        { page:'resumos', icon:'📝', label:'Resumos' },
+        { page:'podcasts', icon:'🎙️', label:'Podcasts' },
+        { page:'simulados', icon:'📋', label:'Simulados' },
+        { page:'games', icon:'🎮', label:'Games' },
+      ]},
+      { section: 'Comunidade', items: [
+        { page:'rede', icon:'🌐', label:'Rede da Turma' },
+        { page:'conquistas', icon:'🏆', label:'Conquistas' },
+      ]},
+    ],
+    teacher: [
+      { section: 'Principal', items: [
+        { page:'home', icon:'🏠', label:'Início' },
+        { page:'professor', icon:'👩‍🏫', label:'Meu Painel' },
+        { page:'biblioteca-admin', icon:'📥', label:'Gestão de Livros' },
+      ]},
+      { section: 'Turma', items: [
+        { page:'rede', icon:'🌐', label:'Rede da Turma' },
+        { page:'chat', icon:'🤖', label:'Chat IA' },
+      ]},
+    ],
+    principal: [
+      { section: 'Principal', items: [
+        { page:'home', icon:'🏠', label:'Início' },
+        { page:'diretor', icon:'🏫', label:'Painel Escola' },
+        { page:'biblioteca-admin', icon:'📥', label:'Gestão de Livros' },
+      ]},
+    ],
+    manager: [
+      { section: 'Principal', items: [
+        { page:'home', icon:'🏠', label:'Início' },
+        { page:'gestor', icon:'🗂️', label:'Painel da Rede' },
+      ]},
+    ],
+  };
+
+  const roleLabels = {
+    student: 'Aluno · 3º Ano A',
+    teacher: 'Professor · Biologia',
+    principal: 'Diretor',
+    manager: 'Gestor de Rede',
+  };
+
+  // ─── Auth ────────────────────────────────────────────
+  function switchAuthTab(tab) {
+    document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('form-register').classList.toggle('hidden', tab !== 'register');
+    const base = 'flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all';
+    document.getElementById('tab-login').className = base + (tab==='login' ? ' bg-white text-dark shadow-sm' : ' text-slate-500');
+    document.getElementById('tab-register').className = base + (tab==='register' ? ' bg-white text-dark shadow-sm' : ' text-slate-500');
+  }
+
+  function selectRole(role) {
+    currentRole = role;
+    document.querySelectorAll('.role-btn').forEach(b => {
+      b.className = 'role-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-200 text-sm font-medium text-slate-500 transition hover:border-slate-300';
+    });
+    document.getElementById('role-' + role).className = 'role-btn flex items-center gap-2 p-3 rounded-xl border-2 border-primary bg-primary/5 text-sm font-medium text-primary transition';
+  }
+
+  function togglePassword(id) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  function enterApp() {
+    document.getElementById('auth-page').style.display = 'none';
+    document.getElementById('app-shell').classList.remove('hidden');
+    buildSidebar();
+    updateRoleUI();
+    navigate('home');
+    updateGreeting();
+    startStudyTimer();
+  }
+
+  function showAuth() {
+    document.getElementById('app-shell').classList.add('hidden');
+    document.getElementById('auth-page').style.display = 'flex';
+  }
+
+  // ─── Role UI ─────────────────────────────────────────
+  function buildSidebar() {
+    const nav = document.getElementById('sidebar-nav');
+    const cfg = navConfig[currentRole] || navConfig.student;
+    nav.innerHTML = cfg.map(section => `
+      <p class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">${section.section}</p>
+      ${section.items.map(item => `
+        <a onclick="navigate('${item.page}')" id="slink-${item.page}"
+           class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm text-slate-300">
+          <span class="text-base">${item.icon}</span> ${item.label}
+        </a>
+      `).join('')}
+    `).join('');
+  }
+
+  function updateRoleUI() {
+    document.getElementById('sidebar-role-label').textContent = roleLabels[currentRole] || 'Aluno';
+  }
+
+  // ─── Navigation ──────────────────────────────────────
+  function navigate(page) {
+    // Chat page needs special display treatment
+    document.querySelectorAll('.page').forEach(p => {
+      p.classList.remove('active');
+      p.style.display = 'none';
+    });
+    const target = document.getElementById('page-' + page);
+    if (target) {
+      if (page === 'chat') {
+        target.style.display = 'flex';
+        target.style.flexDirection = 'column';
+      } else {
+        target.style.display = 'flex';
+        target.classList.add('active');
+      }
+    }
+    document.getElementById('section-title').textContent = titles[page] || page;
+
+    // Sidebar links
+    document.querySelectorAll('.sidebar-link').forEach(l => {
+      l.classList.remove('active', 'text-slate-300');
+      l.classList.add('text-slate-300');
+    });
+    const active = document.getElementById('slink-' + page);
+    if (active) { active.classList.add('active'); active.classList.remove('text-slate-300'); }
+
+    // Mobile nav
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+      b.classList.remove('active');
+      b.querySelectorAll('.nav-icon,.nav-label').forEach(el => {
+        el.classList.remove('text-primary');
+        if (el.classList.contains('nav-icon')) el.classList.add('text-slate-400');
+        if (el.classList.contains('nav-label')) el.classList.add('text-slate-400');
+      });
+    });
+    const mactive = document.getElementById('mnav-' + page);
+    if (mactive) {
+      mactive.classList.add('active');
+      mactive.querySelectorAll('.nav-icon,.nav-label').forEach(el => {
+        el.classList.add('text-primary');
+        el.classList.remove('text-slate-400');
+      });
+    }
+
+    currentPage = page;
+    // Close notifications
+    document.getElementById('notif-panel').classList.add('hidden');
+  }
+
+  // ─── Greeting ────────────────────────────────────────
+  function updateGreeting() {
+    const h = new Date().getHours();
+    const g = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+    document.getElementById('home-greeting').textContent = `${g}, João! 👋`;
+  }
+
+  // ─── Study Timer ─────────────────────────────────────
+  function startStudyTimer() {
+    setInterval(() => {
+      studySeconds++;
+      const m = Math.floor(studySeconds/60).toString().padStart(2,'0');
+      const s = (studySeconds%60).toString().padStart(2,'0');
+      const el = document.getElementById('study-timer');
+      if (el) el.textContent = `00:${m}:${s}`;
+    }, 1000);
+  }
+
+  // ─── Notifications ───────────────────────────────────
+  function toggleNotifications() {
+    const p = document.getElementById('notif-panel');
+    p.classList.toggle('hidden');
+    document.getElementById('notif-indicator').style.display = 'none';
+  }
+  function markAllRead() {
+    document.querySelectorAll('#notif-panel .border-primary').forEach(el => {
+      el.classList.remove('border-primary');
+      el.classList.add('border-transparent');
+    });
+    document.getElementById('notif-indicator').style.display = 'none';
+    document.getElementById('notif-panel').classList.add('hidden');
+  }
+
+  // ─── Chat ────────────────────────────────────────────
+  let chatCtx = 'bio';
+  function setChatContext(ctx) {
+    chatCtx = ctx;
+    document.querySelectorAll('.ctx-btn').forEach(b => {
+      b.className = 'ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-slate-300';
+    });
+    const colors = { bio:'apoio1', mat:'apoio3', qui:'apoio2', his:'primary', fis:'apoio1' };
+    const c = colors[ctx] || 'primary';
+    const btn = document.getElementById('ctx-' + ctx);
+    if (btn) btn.className = `ctx-btn flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-${c}/10 text-${c} border-2 border-${c} flex-shrink-0 transition`;
+  }
+
+  function sendMessage() {
+    const inp = document.getElementById('chat-input');
+    const msg = inp.value.trim();
+    if (!msg) return;
+    inp.value = '';
+
+    // Add user bubble
+    const msgs = document.getElementById('chat-messages');
+    const userDiv = document.createElement('div');
+    userDiv.className = 'flex gap-3 max-w-2xl ml-auto flex-row-reverse';
+    userDiv.innerHTML = `
+      <div class="w-8 h-8 rounded-full xp-gradient flex items-center justify-center text-white text-xs font-bold flex-shrink-0">JS</div>
+      <div class="bg-white rounded-2xl rounded-tr-sm px-4 py-3 border border-primary/20 shadow-sm">
+        <p class="text-sm text-dark">${msg}</p>
+      </div>`;
+    msgs.appendChild(userDiv);
+
+    // Show typing
+    document.getElementById('typing-indicator').classList.remove('hidden');
+    msgs.scrollTop = msgs.scrollHeight;
+
+    // Fake AI response
+    setTimeout(() => {
+      document.getElementById('typing-indicator').classList.add('hidden');
+      const aiDiv = document.createElement('div');
+      aiDiv.className = 'flex gap-3 max-w-2xl';
+      aiDiv.innerHTML = `
+        <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+        </div>
+        <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-100 shadow-sm space-y-2">
+          <p class="text-sm text-slate-700">Ótima pergunta! Com base no seu livro didático, vou explicar esse conceito de forma clara e precisa, seguindo exatamente o que está no material da sua escola.</p>
+          <div class="flex flex-wrap gap-1.5 mt-1">
+            <span class="inline-flex items-center gap-1 text-xs bg-apoio1/10 text-apoio1 border border-apoio1/20 px-2 py-0.5 rounded-full font-medium">📖 Cap.4 · p.72</span>
+          </div>
+          <div class="flex gap-3 pt-1 border-t border-slate-100">
+            <button onclick="navigate('resumos')" class="text-xs text-slate-400 hover:text-apoio3 transition font-medium">📝 Resumo</button>
+            <button onclick="navigate('podcasts')" class="text-xs text-slate-400 hover:text-apoio3 transition font-medium">🎙️ Podcast</button>
+            <button onclick="navigate('simulados')" class="text-xs text-slate-400 hover:text-apoio3 transition font-medium">📋 Simulado</button>
+          </div>
+        </div>`;
+      msgs.appendChild(aiDiv);
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 1800);
+
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function newChat() {
+    const msgs = document.getElementById('chat-messages');
+    msgs.innerHTML = `
+      <div class="flex gap-3 max-w-2xl">
+        <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+        </div>
+        <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-100 shadow-sm">
+          <p class="text-sm text-slate-700">Nova conversa iniciada! 🤖 Selecione a matéria e me faça uma pergunta.</p>
+        </div>
+      </div>`;
+  }
+
+  // ─── Podcast ─────────────────────────────────────────
+  function togglePodcast() {
+    podcastPlaying = !podcastPlaying;
+    const btn = document.getElementById('pod-play-btn');
+    const wave = document.getElementById('wave-container');
+
+    if (podcastPlaying) {
+      btn.textContent = '⏸';
+      wave.style.display = 'flex';
+      podcastInterval = setInterval(() => {
+        podcastPct = Math.min(podcastPct + 0.2, 100);
+        document.getElementById('pod-progress').style.width = podcastPct + '%';
+        document.getElementById('pod-thumb').style.left = 'calc(' + podcastPct + '% - 7px)';
+        const totalSecs = 504; // 8:24
+        const cur = Math.floor(totalSecs * podcastPct / 100);
+        const m = Math.floor(cur/60);
+        const s = (cur%60).toString().padStart(2,'0');
+        document.getElementById('pod-current').textContent = m + ':' + s;
+        if (podcastPct >= 100) { clearInterval(podcastInterval); podcastPlaying = false; btn.textContent = '▶'; wave.style.display = 'none'; }
+      }, 200);
+    } else {
+      btn.textContent = '▶';
+      wave.style.display = 'none';
+      clearInterval(podcastInterval);
+    }
+  }
+
+  function seekPodcast(e) {
+    const track = document.getElementById('pod-track');
+    const rect = track.getBoundingClientRect();
+    podcastPct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    document.getElementById('pod-progress').style.width = podcastPct + '%';
+    document.getElementById('pod-thumb').style.left = 'calc(' + podcastPct + '% - 7px)';
+  }
+
+  // ─── Quiz ────────────────────────────────────────────
+  const quizQuestions = [
+    { q:'Qual é a principal diferença entre mitose e meiose em relação ao número de células filhas produzidas?', opts:['A) Mitose produz 2; meiose produz 2','B) Mitose produz 2; meiose produz 4','C) Mitose produz 4; meiose produz 2','D) Ambas produzem 4 células filhas'], correct:1, page:'p.87' },
+    { q:'O que são cromossomos homólogos?', opts:['A) Cromossomos idênticos','B) Cromossomos do sexo','C) Par de cromossomos com genes nos mesmos loci, um de cada progenitor','D) Cromossomos após a replicação'], correct:2, page:'p.89' },
+    { q:'Em qual fase da mitose os cromossomos se alinham no plano equatorial da célula?', opts:['A) Prófase','B) Metáfase','C) Anáfase','D) Telófase'], correct:1, page:'p.91' },
+    { q:'A meiose é essencial para:', opts:['A) O crescimento do organismo','B) A regeneração de tecidos','C) A formação de gametas com n cromossomos','D) A divisão das células somáticas'], correct:2, page:'p.94' },
+    { q:'O que é crossing-over?', opts:['A) Duplicação do DNA','B) Troca de segmentos entre cromátides homólogas','C) Separação de cromossomos na anáfase','D) Divisão do citoplasma'], correct:1, page:'p.97' },
+  ];
+
+  function startQuiz() {
+    quizCurrentQ = 0;
+    quizCorrect = 0;
+    quizAnswered = false;
+    document.getElementById('quiz-list-view').classList.add('hidden');
+    document.getElementById('quiz-result-view').classList.add('hidden');
+    document.getElementById('quiz-active-view').classList.remove('hidden');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    const q = quizQuestions[quizCurrentQ];
+    document.getElementById('q-current').textContent = quizCurrentQ + 1;
+    document.getElementById('q-total').textContent = quizQuestions.length;
+    document.getElementById('quiz-question').textContent = q.q;
+    document.getElementById('quiz-progress-bar').style.width = ((quizCurrentQ) / quizQuestions.length * 100) + '%';
+    document.getElementById('quiz-score-badge').textContent = quizCorrect;
+
+    const opts = document.getElementById('quiz-options');
+    opts.innerHTML = q.opts.map((o,i) => `
+      <button onclick="answerQuiz(this,${i===q.correct})"
+        class="quiz-option w-full text-left px-4 py-3 rounded-xl border-2 border-slate-200 text-sm font-medium transition">${o}</button>
+    `).join('');
+
+    document.getElementById('quiz-feedback').classList.add('hidden');
+    document.getElementById('quiz-next-btn').classList.add('hidden');
+    quizAnswered = false;
+  }
+
+  function answerQuiz(btn, correct) {
+    if (quizAnswered) return;
+    quizAnswered = true;
+    if (correct) {
+      btn.classList.add('correct');
+      quizCorrect++;
+      document.getElementById('quiz-score-badge').textContent = quizCorrect;
+    } else {
+      btn.classList.add('wrong');
+      // Show correct
+      const q = quizQuestions[quizCurrentQ];
+      document.querySelectorAll('.quiz-option')[q.correct].classList.add('correct');
+    }
+    // Disable all
+    document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+    const fb = document.getElementById('quiz-feedback');
+    fb.classList.remove('hidden');
+    if (correct) {
+      fb.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-apoio2/10 text-apoio2';
+      fb.textContent = '✓ Correto! +20 XP · 📖 ' + quizQuestions[quizCurrentQ].page;
+    } else {
+      fb.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-red-50 text-red-600';
+      fb.textContent = '✗ Incorreto. Reveja · 📖 ' + quizQuestions[quizCurrentQ].page;
+    }
+    document.getElementById('quiz-next-btn').classList.remove('hidden');
+  }
+
+  function nextQuestion() {
+    quizCurrentQ++;
+    if (quizCurrentQ >= quizQuestions.length) {
+      showQuizResult();
+    } else {
+      loadQuestion();
+    }
+  }
+
+  function showQuizResult() {
+    document.getElementById('quiz-active-view').classList.add('hidden');
+    document.getElementById('quiz-result-view').classList.remove('hidden');
+    const pct = Math.round(quizCorrect / quizQuestions.length * 100);
+    document.getElementById('result-score').textContent = quizCorrect + '/' + quizQuestions.length + ' corretas';
+    document.getElementById('result-pct').textContent = pct + '% de acerto';
+    document.getElementById('result-xp').textContent = '+' + (quizCorrect * 20) + ' XP ganhos!';
+    document.getElementById('result-emoji').textContent = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📖';
+  }
+
+  function exitQuiz() {
+    document.getElementById('quiz-active-view').classList.add('hidden');
+    document.getElementById('quiz-result-view').classList.add('hidden');
+    document.getElementById('quiz-list-view').classList.remove('hidden');
+  }
+
+  // ─── Games ───────────────────────────────────────────
+  function openGame(type) {
+    if (type === 'flashcard') {
+      document.getElementById('game-selection').classList.add('hidden');
+      document.getElementById('flashcard-game').classList.remove('hidden');
+    }
+  }
+
+  function closeGame() {
+    document.getElementById('flashcard-game').classList.add('hidden');
+    document.getElementById('game-selection').classList.remove('hidden');
+    document.getElementById('flashcard-el').classList.remove('flipped');
+  }
+
+  function flipCard() {
+    document.getElementById('flashcard-el').classList.toggle('flipped');
+  }
+
+  // ─── Generate Modal ──────────────────────────────────
+  function openGenerateModal(type) {
+    const labels = { resumo:'Gerar novo resumo', podcast:'Gerar novo podcast', simulado:'Criar novo simulado' };
+    document.getElementById('modal-title').textContent = labels[type] || 'Gerar conteúdo';
+    const extra = document.getElementById('modal-extra');
+    if (type === 'simulado') {
+      extra.innerHTML = `<div>
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">Número de questões</label>
+        <div class="flex gap-2">
+          <button onclick="selectQCount(this,5)" class="flex-1 py-2 rounded-xl border-2 border-primary bg-primary/5 text-primary text-sm font-bold">5</button>
+          <button onclick="selectQCount(this,10)" class="flex-1 py-2 rounded-xl border-2 border-slate-200 text-slate-500 text-sm font-bold">10</button>
+          <button onclick="selectQCount(this,15)" class="flex-1 py-2 rounded-xl border-2 border-slate-200 text-slate-500 text-sm font-bold">15</button>
+        </div>
+      </div>`;
+    } else if (type === 'podcast') {
+      extra.innerHTML = `<div>
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">Duração estimada</label>
+        <div class="flex gap-2">
+          <button class="flex-1 py-2 rounded-xl border-2 border-primary bg-primary/5 text-primary text-sm font-bold">~5 min</button>
+          <button class="flex-1 py-2 rounded-xl border-2 border-slate-200 text-slate-500 text-sm font-bold">~10 min</button>
+          <button class="flex-1 py-2 rounded-xl border-2 border-slate-200 text-slate-500 text-sm font-bold">~15 min</button>
+        </div>
+      </div>`;
+    } else {
+      extra.innerHTML = '';
+    }
+    document.getElementById('generate-modal').classList.remove('hidden');
+  }
+
+  function selectQCount(btn, n) {
+    btn.parentElement.querySelectorAll('button').forEach(b => {
+      b.className = 'flex-1 py-2 rounded-xl border-2 border-slate-200 text-slate-500 text-sm font-bold';
+    });
+    btn.className = 'flex-1 py-2 rounded-xl border-2 border-primary bg-primary/5 text-primary text-sm font-bold';
+  }
+
+  function closeModal() {
+    document.getElementById('generate-modal').classList.add('hidden');
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('generate-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ─── Toggle switch ───────────────────────────────────
+  function toggleSwitch(el) {
+    const dot = el.querySelector('div');
+    if (el.classList.contains('bg-apoio2')) {
+      el.classList.replace('bg-apoio2','bg-slate-200');
+      dot.classList.replace('right-0.5','left-0.5');
+    } else {
+      el.classList.replace('bg-slate-200','bg-apoio2');
+      dot.classList.replace('left-0.5','right-0.5');
+    }
+  }
+
+  // ─── Upload helpers ──────────────────────────────────
+  function handleFileSelect(e) { const f = e.target.files[0]; if(f) showFileInfo(f); }
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('drop-zone').classList.remove('border-primary','bg-primary/5');
+    const f = e.dataTransfer.files[0];
+    if(f && f.type==='application/pdf') showFileInfo(f);
+  }
+  function showFileInfo(f) {
+    document.getElementById('drop-zone').classList.add('hidden');
+    document.getElementById('file-selected').classList.remove('hidden');
+    document.getElementById('file-name').textContent = f.name;
+    document.getElementById('file-size').textContent = (f.size/1024/1024).toFixed(2)+' MB';
+  }
+  function clearFile() {
+    document.getElementById('drop-zone').classList.remove('hidden');
+    document.getElementById('file-selected').classList.add('hidden');
+    document.getElementById('pdf-input').value='';
+  }
+  function startUpload() {
+    const title = document.getElementById('book-title').value.trim();
+    const subject = document.getElementById('book-subject').value;
+    const fi = document.getElementById('pdf-input');
+    if(!title||!subject||!fi.files[0]) { alert('Preencha título, disciplina e selecione um PDF.'); return; }
+    const btn = event.currentTarget;
+    btn.innerHTML = '<span class="animate-spin">⏳</span> Enviando...';
+    btn.disabled = true;
+    let pct = 0;
+    const bar = document.getElementById('ingest-progress');
+    const t = setInterval(()=>{ pct=Math.min(pct+Math.random()*8,95); if(bar) bar.style.width=pct+'%'; },400);
+    setTimeout(()=>{
+      clearInterval(t);
+      if(bar) bar.style.width='100%';
+      btn.innerHTML = '✅ Ingestão iniciada!';
+      setTimeout(()=>{ btn.innerHTML='<span>☁️</span> Upload e Iniciar Ingestão'; btn.disabled=false; clearFile(); document.getElementById('book-title').value=''; document.getElementById('book-subject').value=''; if(bar) bar.style.width='57%'; },2000);
+    },3500);
+  }
+
+  // ─── Book filter ─────────────────────────────────────
+  function filterBooks(f) {}
+
+  // ─── Init ────────────────────────────────────────────
+  document.getElementById('auth-page').style.display = 'flex';
+</script>
+</body>
+</html>

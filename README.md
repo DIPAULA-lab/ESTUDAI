@@ -1,2 +1,1 @@
-# ESTUDAI
-REPOSITÓRIO DEDICADO A HOSPEDAR CÓDIGO PROTÓTIPO ESTUDAi
+Esse repositório serve para armazenar os códigos salvos de simuladores da EstudA
