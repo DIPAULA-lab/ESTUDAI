@@ -3683,8 +3683,11 @@
     const paths = a.paths.map(p => p.clip ? `<g clip-path="url(#sc-${p.clip})"><path d="${p.d}"/></g>` : `<path d="${p.d}"/>`).join('');
     return `<svg class="${cls}" style="${style}" viewBox="${a.vb.join(' ')}" aria-hidden="true">${clips ? `<defs>${clips}</defs>` : ''}${paths}</svg>`;
   }
-  function chatFrameSVG(f, cls, shadow){
-    return `<svg class="${cls}" viewBox="0 0 ${f.w} ${f.h}" preserveAspectRatio="none" aria-hidden="true">${shadow ? `<path class="sc-shadow" d="${f.d}" stroke-width="${f.sw}" transform="translate(4 4)"/>` : ''}<path d="${f.d}" stroke-width="${f.sw}"/></svg>`;
+  // Nas abas o rótulo pode ser mais largo que o do design e a moldura estica só na horizontal; o traço fica com a
+  // espessura fixa (em unidades do design) para os lados não engrossarem.
+  function chatFrameSVG(f, cls, shadow, fixedStroke){
+    const sw = fixedStroke ? `vector-effect="non-scaling-stroke" style="stroke-width:calc(${+(f.sw * 0.75).toFixed(3)} * var(--hu))"` : `stroke-width="${f.sw}"`;
+    return `<svg class="${cls}" viewBox="0 0 ${f.w} ${f.h}" preserveAspectRatio="none" aria-hidden="true">${shadow ? `<path class="sc-shadow" d="${f.d}" ${sw} transform="translate(4 4)"/>` : ''}<path d="${f.d}" ${sw}/></svg>`;
   }
   function chatCardHTML(c){
     const u = v => `calc(${v} * var(--cu))`;
@@ -3707,7 +3710,7 @@
     });
     const nav = tabs.map((t, k) => {
       const lay = chatTabLayout[k % chatTabLayout.length];
-      const frame = chatFrameSVG(chatArt.tabs[k % chatArt.tabs.length], '', false);
+      const frame = chatFrameSVG(chatArt.tabs[k % chatArt.tabs.length], '', false, true);
       const style = `min-width:calc(${lay.w} * var(--hu));--pt:${lay.pt || 0};--pb:${lay.pb || 0};--px:${lay.label === t.label ? 5 : 9}`;
       if (!t.items) return `<div class="sc-tabw"><button type="button" class="sc-tab" style="${style}" onclick="navigate('${t.go}')">${frame}${t.label}</button></div>`;
       return `<div class="sc-tabw" onclick="event.stopPropagation()">
@@ -3738,7 +3741,11 @@
   let chatRole = null;
   function renderChat(){
     const head = document.getElementById('chat-head'); if (!head) return;
-    if (chatRole && chatRole !== currentRole) resetChat(); // outro perfil entrou: não mostra a conversa anterior
+    if (chatRole && chatRole !== currentRole) { // outro perfil entrou: não mostra a conversa, o rascunho nem a matéria anteriores
+      resetChat();
+      document.getElementById('chat-input').value = '';
+      setChatContext('bio');
+    }
     chatRole = currentRole;
     head.innerHTML = chatHeadHTML();
     const cards = document.getElementById('chat-cards');
