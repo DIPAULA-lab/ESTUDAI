@@ -236,6 +236,127 @@
     .sh-panel { width: calc(347.31 * var(--hu)); grid-template-columns: repeat(2, 1fr); }
   }
 </style>
+<style>
+  /* ── Chat com IA — medidas do design (mesmo quadro da Home: 1188 × 672,75).
+     --hu (cabeçalho, igual ao da Home) e --cu (conteúdo) equivalem a 1px do design; no desktop são iguais. ── */
+  #app-shell.sc-on #content-wrap { min-width: 0; }
+  #app-shell.sc-on #content-wrap > header { display: none; }
+  #app-shell.sc-on main { padding-bottom: 0; }
+
+  .sc {
+    --hu: max(0.75px, min(calc(100vh / 672.75), calc(100vw / 1188)));
+    --cu: max(var(--hu), min(1.02px, calc((100vw - 32px) / 678.75)));
+    --sc-off: max(0px, (100vh - var(--sc-nav, 0px) - 672.75 * var(--cu)) / 2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: max(100vh, calc(672.75 * var(--hu)));
+    background: #fff;
+  }
+  .sc .sh-head { flex: none; }
+
+  /* Navegação do topo: molduras desenhadas à mão (traço de lápis), texto vermelho */
+  .sc-nav  { position: absolute; top: calc(9.75 * var(--hu)); left: calc(50% - 4.5 * var(--hu)); transform: translateX(-50%); display: flex; gap: calc(11.25 * var(--hu)); z-index: 5; }
+  .sc-tabw { position: relative; }
+  .sc-tab  { position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box; height: calc(24.75 * var(--hu)); padding: calc(var(--pt, 0) * var(--hu)) calc(var(--px, 5) * var(--hu)) calc(var(--pb, 0) * var(--hu)); background: none; border: 0; font: 700 max(9px, calc(10.45 * var(--hu)))/1 'Raleway', sans-serif; color: #E7191F; white-space: nowrap; cursor: pointer; }
+  .sc-tab svg  { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .sc-tab path { fill: none; stroke: #000; stroke-linecap: round; transition: stroke .15s; }
+  .sc-tab:hover path, .sc-tabw:has(.sc-drop:not(.hidden)) .sc-tab path { stroke: #E7191F; }
+  .sc-drop { position: absolute; top: calc(100% + 8 * var(--hu)); left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: calc(2 * var(--hu)); min-width: calc(150 * var(--hu)); padding: calc(6 * var(--hu)); background: #fff; border-radius: calc(6.75 * var(--hu)); box-shadow: inset 0 0 0 calc(1.5 * var(--hu)) #000, calc(4 * var(--hu)) calc(4 * var(--hu)) 0 #000; z-index: 50; }
+  .sc-drop.hidden { display: none; }
+  .sc-drop button { display: flex; align-items: center; gap: calc(8 * var(--hu)); padding: calc(8 * var(--hu)) calc(10 * var(--hu)); background: none; border: 0; border-radius: calc(4.5 * var(--hu)); font: 600 max(12px, calc(10.31 * var(--hu)))/1 'Raleway', sans-serif; color: #000; text-align: left; white-space: nowrap; cursor: pointer; transition: box-shadow .15s, color .15s; }
+  .sc-drop button:hover { color: #E7191F; box-shadow: inset 0 0 0 calc(1.5 * var(--hu)) #E7191F; }
+  .sc-drop .ico { color: #E7191F; }
+
+  /* Estado inicial: símbolo, saudação e cartões, nas posições do design (centralizados como a Home) */
+  .sc-body  { position: relative; flex: none; padding-top: calc(var(--sc-off) + 82.725 * var(--cu)); }
+  .sc-empty { display: flex; flex-direction: column; align-items: center; }
+  .sc-mark  { display: block; width: calc(42.75 * var(--cu)); height: calc(41.55 * var(--cu)); fill: #ED4437; }
+  .sc-greet { margin: calc(32.95 * var(--cu)) 0 0; transform: translateX(calc(-5.25 * var(--cu))); font: 500 calc(22.74 * var(--cu))/1 'Raleway', sans-serif; word-spacing: calc(-0.75 * var(--cu)); color: #000; white-space: nowrap; }
+  .sc-cards { display: flex; margin-top: calc(37.51 * var(--cu)); }
+
+  /* Contorno desenhado à mão; ao passar o mouse o cartão sobe e ganha a "sombra" do mesmo traço */
+  .sc-card  { position: relative; flex: none; height: calc(81.75 * var(--cu)); padding: 0; background: none; border: 0; text-align: left; cursor: pointer; transition: transform .12s; }
+  .sc-card:hover { transform: translate(calc(-1.5 * var(--cu)), calc(-1.5 * var(--cu))); }
+  .sc-frame { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .sc-frame path { fill: none; stroke: #000; stroke-linecap: round; }
+  .sc-frame .sc-shadow { opacity: 0; transition: opacity .12s; }
+  .sc-card:hover .sc-shadow { opacity: 1; }
+  .sc-ico   { position: absolute; fill: #FF0007; }
+  .sc-title { position: absolute; margin: 0; font: 400 calc(17.45 * var(--cu))/1 'Raleway', sans-serif; color: #E7191F; white-space: nowrap; }
+  .sc-desc  { position: absolute; margin: 0; font: 400 calc(7.85 * var(--cu))/calc(10 * var(--cu)) 'Inter', sans-serif; font-variation-settings: 'opsz' 32; color: #000; white-space: nowrap; }
+
+  /* Barra de pergunta + seletor de contexto */
+  .sc-dock  { flex: none; width: calc(678.75 * var(--cu)); max-width: 100%; margin: calc(53.25 * var(--cu)) auto 0; }
+  .sc-input { display: flex; align-items: center; height: calc(48 * var(--cu)); background: #fff; border-radius: calc(3.75 * var(--cu)); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #E7191F; }
+  .sc-input input { flex: 1; min-width: 0; height: 100%; padding: 0 calc(12 * var(--cu)); background: transparent; border: 0; outline: 0; font: 400 max(14px, calc(11 * var(--cu)))/1 'Inter', sans-serif; color: #000; }
+  .sc-input input::placeholder { color: #BFBFBF; opacity: 1; }
+  .sc-input:focus-within { box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #E7191F, 0 0 0 calc(3 * var(--cu)) rgba(231, 25, 31, .14); }
+  .sc-btn   { flex: none; display: flex; padding: 0; background: none; border: 0; cursor: pointer; transition: transform .12s; }
+  .sc-btn:hover { transform: scale(1.12); }
+  .sc-btn svg { display: block; width: 100%; height: 100%; fill: #FF0007; }
+  .sc-plus  { width: calc(17.25 * var(--cu)); height: calc(17.25 * var(--cu)); margin-left: calc(12 * var(--cu)); }
+  .sc-send  { width: calc(15.75 * var(--cu)); height: calc(12.75 * var(--cu)); margin-right: calc(22.5 * var(--cu)); }
+
+  .sc-ctx   { display: flex; align-items: center; gap: calc(3.4 * var(--cu)); margin-top: calc(3.75 * var(--cu)); padding-left: calc(3 * var(--cu)); overflow-x: auto; scrollbar-width: none; }
+  .sc-ctx::-webkit-scrollbar { display: none; }
+  .sc-ctx-label { flex: none; margin-right: calc(2.6 * var(--cu)); font: 700 max(8px, calc(5.9 * var(--cu)))/1 'Plus Jakarta Sans', sans-serif; color: #E7191F; }
+  .sc-chip  { flex: none; display: inline-flex; align-items: center; gap: calc(2.4 * var(--cu)); height: max(16px, calc(15 * var(--cu))); padding: 0 max(6px, calc(6 * var(--cu))); background: #fff; border: 0; border-radius: 999px; box-shadow: inset 0 0 0 max(1px, calc(.75 * var(--cu))) #E2E8F0; font: 500 max(8px, calc(5.6 * var(--cu)))/1 'Plus Jakarta Sans', sans-serif; color: #64748B; cursor: pointer; transition: box-shadow .15s, color .15s; }
+  .sc-chip:hover { box-shadow: inset 0 0 0 max(1px, calc(.75 * var(--cu))) #94A3B8; }
+  .sc-chip.is-active { background: #E8F0FE; box-shadow: inset 0 0 0 max(1px, calc(.75 * var(--cu))) #3B82F6; color: #3B82F6; font-weight: 700; }
+
+  /* Conversa: a área de mensagens rola e a barra fica presa embaixo */
+  .sc.is-talking { height: 100vh; height: 100dvh; min-height: 0; }
+  .sc.is-talking .sc-body  { flex: 1; min-height: 0; padding-top: 0; overflow-y: auto; }
+  .sc.is-talking .sc-empty { display: none; }
+  .sc.is-talking .sc-dock  { margin-top: 0; padding: calc(12 * var(--cu)) 0 calc(18 * var(--cu)); }
+  .sc-conv  { display: none; flex-direction: column; gap: calc(16 * var(--cu)); width: calc(678.75 * var(--cu)); max-width: 100%; margin: 0 auto; padding: calc(24 * var(--cu)) 0 calc(8 * var(--cu)); }
+  .sc.is-talking .sc-conv { display: flex; }
+  .sc-msg   { display: flex; align-items: flex-start; gap: calc(9 * var(--cu)); animation: fadeUp .3s ease both; }
+  .sc-msg.hidden { display: none; }
+  .sc-me    { flex-direction: row-reverse; }
+  .sc-av    { flex: none; display: flex; align-items: center; justify-content: center; width: calc(27 * var(--cu)); height: calc(27 * var(--cu)); border-radius: calc(6.75 * var(--cu)); font: 600 max(10px, calc(9 * var(--cu)))/1 'Raleway', sans-serif; }
+  .sc-me .sc-av { background: #000; color: #fff; }
+  .sc-ai .sc-av { background: #fff; box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #E7191F; }
+  .sc-ai .sc-av svg { width: 56%; fill: #ED4437; }
+  .sc-bubble { min-width: 0; max-width: 80%; padding: calc(10 * var(--cu)) calc(13 * var(--cu)); background: #fff; border-radius: calc(6.75 * var(--cu)); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #000, calc(3 * var(--cu)) calc(3 * var(--cu)) 0 #000; font: 400 max(14px, calc(10.5 * var(--cu)))/1.55 'Inter', sans-serif; color: #000; overflow-wrap: anywhere; }
+  .sc-bubble p { margin: 0; font: inherit; }
+  .sc-me .sc-bubble { border-top-right-radius: calc(1.5 * var(--cu)); }
+  .sc-ai .sc-bubble { border-top-left-radius: calc(1.5 * var(--cu)); }
+  .sc-refs  { display: flex; flex-wrap: wrap; gap: calc(4 * var(--cu)); margin-top: calc(8 * var(--cu)); }
+  .sc-ref   { display: inline-flex; align-items: center; gap: calc(3 * var(--cu)); padding: max(4px, calc(3 * var(--cu))) max(8px, calc(7 * var(--cu))); border-radius: 999px; box-shadow: inset 0 0 0 max(1px, calc(.75 * var(--cu))) #E2E8F0; font: 600 max(11px, calc(7.5 * var(--cu)))/1 'Plus Jakarta Sans', sans-serif; color: #64748B; }
+  .sc-acts  { display: flex; flex-wrap: wrap; gap: calc(6 * var(--cu)) calc(14 * var(--cu)); margin-top: calc(10 * var(--cu)); padding-top: calc(9 * var(--cu)); border-top: max(1px, calc(.75 * var(--cu))) solid #E5E7EB; }
+  .sc-act   { display: inline-flex; align-items: center; gap: calc(4 * var(--cu)); padding: 0; background: none; border: 0; font: 600 max(12px, calc(8.5 * var(--cu)))/1 'Raleway', sans-serif; color: #000; cursor: pointer; transition: color .15s; }
+  .sc-act:hover { color: #E7191F; }
+  .sc-act .ico { color: #E7191F; }
+  .sc-typing { display: flex; align-items: center; gap: 5px; height: max(22px, calc(16 * var(--cu))); }
+  .sc-typing .typing-dot { background: #E7191F; }
+
+  /* Tablet e celular: a barra inferior de navegação aparece (abaixo de 1024px), então a tela desconta a altura dela */
+  @media (max-width: 1023px) {
+    .sc { --sc-nav: 64px; min-height: max(calc(100vh - var(--sc-nav)), calc(672.75 * var(--hu))); }
+    .sc.is-talking { height: calc(100vh - var(--sc-nav)); height: calc(100dvh - var(--sc-nav)); }
+    .sc.is-talking .sc-dock { padding-bottom: 30px; }
+  }
+  /* Celular: navegação some (fica a barra inferior), cartões empilhados e a barra de pergunta sempre embaixo */
+  @media (max-width: 767px) {
+    .sc { --hu: min(1px, calc((100vw - 32px) / 347.31)); --cu: min(1.5px, calc((100vw - 32px) / 212)); height: calc(100vh - var(--sc-nav)); height: calc(100dvh - var(--sc-nav)); min-height: 0; }
+    .sc-nav { display: none; }
+    .sc-body, .sc.is-talking .sc-body { flex: 1; min-height: 0; overflow-y: auto; padding: 28px 16px 16px; }
+    .sc-greet { margin-top: 24px; transform: none; white-space: normal; text-align: center; }
+    .sc-cards { flex-direction: column; gap: 12px; margin-top: 28px; }
+    .sc-card  { margin: 0 !important; }
+    .sc-conv  { width: auto; padding-top: 0; }
+    .sc-dock, .sc.is-talking .sc-dock { width: auto; margin: 0 16px; padding: 8px 0 30px; }
+    .sc-input { height: 52px; }
+    .sc-plus  { width: 18px; height: 18px; margin-left: 14px; }
+    .sc-send  { width: 17px; height: 14px; margin-right: 16px; }
+    .sc-input input { padding: 0 12px; }
+    .sc-ctx-label { font-size: 12px; }
+    .sc-chip  { height: 30px; padding: 0 12px; gap: 4px; font-size: 12px; }
+  }
+</style>
 </head>
 <body class="bg-fundo text-dark antialiased">
 
@@ -593,84 +714,45 @@
         </div>
       </div>
 
-      <!-- ── CHAT ── -->
-      <div id="page-chat" class="page" style="height:calc(100vh - 57px); display:none; flex-direction:column;">
-        <!-- Subject selector bar -->
-        <div class="bg-white border-b border-slate-100 px-4 py-2.5 flex items-center gap-2 overflow-x-auto flex-shrink-0">
-          <span class="text-xs font-semibold text-slate-500 flex-shrink-0">Contexto:</span>
-          <button onclick="setChatContext('bio')" id="ctx-bio" class="ctx-btn flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-apoio1/10 text-apoio1 border-2 border-apoio1 flex-shrink-0 transition"><i data-lucide=dna class=ico></i> Biologia</button>
-          <button onclick="setChatContext('mat')" id="ctx-mat" class="ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-apoio3"><i data-lucide=ruler class=ico></i> Matemática</button>
-          <button onclick="setChatContext('qui')" id="ctx-qui" class="ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-apoio2"><i data-lucide=flask-round class=ico></i> Química</button>
-          <button onclick="setChatContext('his')" id="ctx-his" class="ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-primary"><i data-lucide=scroll class=ico></i> História</button>
-          <button onclick="setChatContext('fis')" id="ctx-fis" class="ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-apoio1"><i data-lucide=zap class=ico></i> Física</button>
-          <div class="flex-1"></div>
-          <button onclick="newChat()" class="text-xs text-slate-500 border border-slate-200 px-3 py-1.5 rounded-xl hover:bg-slate-50 transition font-medium flex-shrink-0">+ Nova conversa</button>
-        </div>
+      <!-- ── CHAT (fiel ao design de referência; cabeçalho e cartões montados por renderChat) ── -->
+      <div id="page-chat" class="page" style="display:none; flex-direction:column;">
+        <div class="sc" id="chat-screen">
+          <div class="sh-head" id="chat-head"></div>
 
-        <!-- Messages -->
-        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-fundo" id="chat-messages">
-          <!-- Welcome -->
-          <div class="flex gap-3 max-w-2xl">
-            <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+          <div class="sc-body" id="chat-messages">
+            <div class="sc-empty fade-up" id="chat-empty-state">
+              <svg class="sc-mark" viewBox="0 0 57 55.4" aria-hidden="true"><path d="M28.5 0L57 14.25V15.75L28.5 30L0 15.75V14.25ZM0 22.65L28.5 36.9L57 22.65V28.65L28.5 42.9L0 28.65ZM0 35.15L28.5 49.4L57 35.15V41.15L28.5 55.4L0 41.15ZM0 14.25L4.1 12.2V43.2L0 41.15Z"/></svg>
+              <h2 class="sc-greet" id="chat-greeting">Mão na massa, João!</h2>
+              <div class="sc-cards" id="chat-cards"></div>
             </div>
-            <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm card-soft">
-              <p class="text-sm text-slate-700">Olá, João! Sou a IA do EstudAI. Baseio minhas respostas <strong>exclusivamente no seu livro didático</strong>, com referências exatas de página e capítulo. Selecione a matéria acima e me faça uma pergunta!</p>
-            </div>
-          </div>
-          <!-- User message -->
-          <div class="flex gap-3 max-w-2xl ml-auto flex-row-reverse">
-            <div class="w-8 h-8 rounded-full xp-gradient flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">JS</div>
-            <div class="bg-white rounded-2xl rounded-tr-sm px-4 py-3 border border-primary/20 shadow-sm">
-              <p class="text-sm text-dark">Me explica o que é mitose e como ela difere da meiose</p>
-            </div>
-          </div>
-          <!-- AI response -->
-          <div class="flex gap-3 max-w-2xl">
-            <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
-            </div>
-            <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm space-y-2 card-soft">
-              <p class="text-sm text-slate-700"><strong>Mitose</strong> é o processo de divisão celular que resulta em duas células filhas geneticamente idênticas à célula mãe, mantendo o número diploide de cromossomos (2n).</p>
-              <p class="text-sm text-slate-700">Já a <strong>meiose</strong> gera quatro células filhas haploides (n), com metade dos cromossomos, sendo essencial para a formação de gametas.</p>
-              <div class="flex flex-wrap gap-1.5 mt-1">
-                <span class="inline-flex items-center gap-1 text-xs bg-apoio1/10 text-apoio1 border border-apoio1/20 px-2 py-0.5 rounded-full cursor-pointer hover:bg-apoio1/20 transition font-medium"><i data-lucide=book-open class=ico></i> Bio. Celular · p.87–90</span>
-                <span class="inline-flex items-center gap-1 text-xs bg-apoio1/10 text-apoio1 border border-apoio1/20 px-2 py-0.5 rounded-full cursor-pointer hover:bg-apoio1/20 transition font-medium"><i data-lucide=book-open class=ico></i> Cap.5 · p.102</span>
-              </div>
-              <div class="flex gap-3 pt-1 border-t border-slate-100 mt-1">
-                <button onclick="navigate('resumos')" class="text-xs text-slate-400 hover:text-apoio3 transition flex items-center gap-1 font-medium"><i data-lucide=file-text class=ico></i> Gerar resumo</button>
-                <button onclick="navigate('podcasts')" class="text-xs text-slate-400 hover:text-apoio3 transition flex items-center gap-1 font-medium"><i data-lucide=mic class=ico></i> Criar podcast</button>
-                <button onclick="navigate('simulados')" class="text-xs text-slate-400 hover:text-apoio3 transition flex items-center gap-1 font-medium"><i data-lucide=clipboard-list class=ico></i> Montar simulado</button>
+
+            <div class="sc-conv" id="chat-conversation" aria-live="polite">
+              <div class="sc-msg sc-ai hidden" id="typing-indicator">
+                <div class="sc-av"><svg viewBox="0 0 57 55.4" aria-hidden="true"><path d="M28.5 0L57 14.25V15.75L28.5 30L0 15.75V14.25ZM0 22.65L28.5 36.9L57 22.65V28.65L28.5 42.9L0 28.65ZM0 35.15L28.5 49.4L57 35.15V41.15L28.5 55.4L0 41.15ZM0 14.25L4.1 12.2V43.2L0 41.15Z"/></svg></div>
+                <div class="sc-bubble sc-typing" aria-label="A IA está digitando"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Typing indicator (hidden by default) -->
-        <div id="typing-indicator" class="hidden px-4 pb-2">
-          <div class="flex gap-3 max-w-2xl">
-            <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
+          <div class="sc-dock">
+            <div class="sc-input">
+              <button type="button" class="sc-btn sc-plus" onclick="newChat()" title="Nova conversa" aria-label="Nova conversa">
+                <svg viewBox="0 0 23 23" aria-hidden="true"><path d="M9 0H14V9H23V14H14V23H9V14H0V9H9Z"/></svg>
+              </button>
+              <input type="text" id="chat-input" placeholder="Pergunte sobre o seu livro..." autocomplete="off" onkeydown="if(event.key==='Enter')sendMessage()" />
+              <button type="button" class="sc-btn sc-send" onclick="sendMessage()" title="Enviar" aria-label="Enviar pergunta">
+                <svg viewBox="0 0 21 17" aria-hidden="true"><path d="M0 0H7.5L21 6.3V10.3L9.5 17H1.5V12.5L10.5 7.5L0 1.67Z"/></svg>
+              </button>
             </div>
-            <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5 card-soft">
-              <div class="typing-dot"></div>
-              <div class="typing-dot"></div>
-              <div class="typing-dot"></div>
+            <div class="sc-ctx">
+              <span class="sc-ctx-label">Contexto:</span>
+              <button type="button" onclick="setChatContext('bio')" id="ctx-bio" class="ctx-btn sc-chip is-active" aria-pressed="true"><i data-lucide=sparkle class=ico></i>Biologia</button>
+              <button type="button" onclick="setChatContext('mat')" id="ctx-mat" class="ctx-btn sc-chip" aria-pressed="false"><i data-lucide=pencil class=ico></i>Matemática</button>
+              <button type="button" onclick="setChatContext('qui')" id="ctx-qui" class="ctx-btn sc-chip" aria-pressed="false"><i data-lucide=flask-round class=ico></i>Química</button>
+              <button type="button" onclick="setChatContext('his')" id="ctx-his" class="ctx-btn sc-chip" aria-pressed="false"><i data-lucide=scroll class=ico></i>História</button>
+              <button type="button" onclick="setChatContext('fis')" id="ctx-fis" class="ctx-btn sc-chip" aria-pressed="false"><i data-lucide=zap class=ico></i>Física</button>
             </div>
           </div>
-        </div>
-
-        <!-- Input -->
-        <div class="bg-white border-t border-slate-200 px-4 py-3 flex-shrink-0">
-          <div class="flex gap-2 items-end">
-            <div class="flex-1 bg-slate-100 rounded-2xl px-4 py-2.5 min-h-[44px] flex items-center">
-              <input type="text" id="chat-input" placeholder="Pergunte algo sobre o seu livro..." class="w-full bg-transparent text-sm focus:outline-none" onkeydown="if(event.key==='Enter')sendMessage()" />
-            </div>
-            <button onclick="sendMessage()" class="w-10 h-10 xp-gradient rounded-xl flex items-center justify-center text-white hover:opacity-90 transition flex-shrink-0 shadow-md shadow-primary/30">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-            </button>
-          </div>
-          <p class="text-center text-[10px] text-slate-400 mt-1.5 font-medium">Respostas baseadas no livro oficial · sempre com referência de página</p>
         </div>
       </div>
 
@@ -2955,6 +3037,8 @@
     if (page !== 'home' && currentRole === 'student') lastStudentPage = page;
     // A home do aluno tem cabeçalho próprio (do design), então o topo padrão some só nela
     document.getElementById('app-shell').classList.toggle('sh-on', page === 'home' && currentRole === 'student');
+    document.getElementById('app-shell').classList.toggle('sc-on', page === 'chat');
+    if (page === 'chat') renderChat();
     renderHeaderNav();
     const _hn=document.getElementById('header-nav'); if(_hn) _hn.style.display = (page==='home') ? 'none' : '';
     closeHeaderMenus(); closeAvatarMenu();
@@ -3576,77 +3660,164 @@
   }
 
   // ─── Chat ────────────────────────────────────────────
+  // Arte do Chat com IA, extraída do design de referência (tela de 1584 px de largura = 4/3 do design):
+  // molduras desenhadas à mão em px da referência (os cartões e botões usam a mesma proporção, então escalam sem distorcer)
+  // e os vetores da brand guideline (mochila, notas, A+), em coordenadas próprias (vb = viewBox justo no traço).
+  const chatArt = {"mark":"M28.5 0L57 14.25V15.75L28.5 30L0 15.75V14.25ZM0 22.65L28.5 36.9L57 22.65V28.65L28.5 42.9L0 28.65ZM0 35.15L28.5 49.4L57 35.15V41.15L28.5 55.4L0 41.15ZM0 14.25L4.1 12.2V43.2L0 41.15Z","frames":{"c1":{"w":267,"h":109,"d":"M1 4.81Q133 2.52 265 3.9M266.42 2Q263.41 52.5 260.34 103M3 107.95Q131.5 98.76 260 104.96M4.89 5Q5.27 56 0.97 107","sw":1.9},"c2":{"w":268,"h":109,"d":"M0 3.84Q130 9.83 260 4.91M260.88 3Q264.11 55.5 267.17 108M2 105.06Q135 106.98 268 106.14M1.51 0Q6.04 52 5.59 104","sw":1.9},"c3":{"w":268,"h":109,"d":"M2 4.81Q134 2.54 266 3.9M267.36 2Q264.36 52.5 261.29 103M4 109.1Q132.5 98.21 261 104.94M5.85 5Q6.19 56 1.94 107","sw":1.89}},"tabs":[{"w":80,"h":33,"d":"M2 1.5Q40.5 1.48 79 1.51M80.03 2Q78.31 16.5 78.36 31M1 33.16Q39.5 30.05 78 31.94M1.18 2Q2.35 17 0.27 32","sw":0.51},{"w":79,"h":33,"d":"M2 1.5Q40 1.5 78 1.5M79.03 2Q77.43 17 77.36 32M3 32.3Q40 29.14 77 31.24M1.18 2Q2.34 17.5 0.3 33","sw":0.54},{"w":77,"h":33,"d":"M2 1.5Q36.5 1.84 71 2.39M76.73 4Q75.22 17 75.32 30M2 31.83Q39 28.8 76 31.05M1.3 3Q2.19 17 -0.01 31","sw":0.48},{"w":80,"h":33,"d":"M1 1.5Q40 1.5 79 1.5M79.81 2Q79.08 17 78.05 32M0 31.98Q39 29.53 78 30.89M1.8 3Q1.24 17.5 1.67 32","sw":0.54}],"icons":{"mochila":{"vb":[2.8,0.35,46.35,54.95],"clips":{"be8bc738b1":"M 2.80 0 L 50 0 L 50 55.51 L 2.80 55.51 Z M 2.80 0"},"paths":[{"d":"M 48.26 22.16 L 48.17 21.70 C 48.08 21.25 47.96 20.55 47.82 19.70 C 46.11 9.42 43.93 -0.00 39.70 0.36 C 36.23 0.68 33.85 3.90 32.65 6.03 C 32.26 4.94 31.67 3.97 30.88 3.12 C 30.57 2.79 30.23 2.51 29.85 2.28 C 29.48 2.05 29.07 1.87 28.64 1.75 C 28.21 1.62 27.78 1.56 27.33 1.56 C 26.89 1.56 26.45 1.62 26.02 1.73 C 21.40 2.90 20.05 8.51 19.74 10.26 C 17.46 10.98 15.44 12.13 13.66 13.71 C 12.89 13.96 12.16 14.27 11.43 14.62 C 3.19 18.69 2.84 48.99 2.83 50.28 C 2.83 50.50 2.91 50.69 3.07 50.84 C 5.27 52.95 22.17 55.27 28.12 55.27 C 28.72 55.29 29.31 55.25 29.90 55.13 C 30.03 55.09 30.16 55.04 30.28 54.96 C 31.72 54.76 38.72 53.49 40.09 48.30 C 51.70 39.26 49.12 26.41 48.26 22.16 Z M 38.79 25.57 C 38.65 24.60 38.52 23.67 38.40 22.79 C 37.80 18.44 36.69 15.44 34.74 13.38 C 36.37 10.05 38.33 7.13 39.10 6.91 C 39.12 6.92 39.12 6.93 39.13 6.94 C 40.45 9.31 43.80 28.58 40.32 37.95 C 39.95 33.91 39.33 29.5 38.79 25.57 Z M 26.40 3.23 C 27.01 3.06 27.62 3.07 28.23 3.24 C 28.83 3.42 29.35 3.74 29.77 4.21 C 30.80 5.38 31.44 6.73 31.68 8.27 C 31.68 8.32 31.69 8.38 31.71 8.43 C 31.88 9.37 31.90 10.32 31.78 11.27 C 31.16 10.97 30.53 10.72 29.87 10.51 C 30.11 8.65 29.96 5.97 28.64 4.66 C 28.35 4.36 28 4.15 27.58 4.03 C 27.18 3.92 26.77 3.91 26.35 4.01 C 23.90 4.54 22.34 8.35 21.84 9.76 L 21.41 9.84 C 21.86 7.89 23.18 4.05 26.40 3.23 Z M 26.75 9.76 C 25.70 9.59 24.64 9.53 23.58 9.58 C 24.22 8.03 25.41 5.81 26.69 5.53 C 27.02 5.43 27.31 5.51 27.55 5.76 C 28.24 6.44 28.57 8.30 28.37 10.09 C 27.85 9.97 27.32 9.86 26.75 9.76 Z M 4.39 49.91 C 4.5 41.12 6.06 19.00 12.12 16.01 C 16.39 13.92 21.11 13.73 24.43 15.53 C 25.01 15.83 25.55 16.20 26.03 16.64 C 26.52 17.07 26.94 17.56 27.31 18.10 C 27.67 18.65 27.97 19.23 28.19 19.84 C 28.41 20.46 28.55 21.09 28.62 21.74 C 29.53 29.03 29.48 50.54 29.23 53.70 C 26.10 54.24 7.33 51.73 4.39 49.91 Z M 30.79 53.30 C 31.07 48.21 30.98 28.26 30.16 21.55 C 30.07 20.78 29.90 20.03 29.64 19.30 C 29.37 18.57 29.02 17.88 28.58 17.24 C 28.15 16.59 27.64 16.01 27.07 15.49 C 26.49 14.97 25.86 14.53 25.17 14.16 C 22.80 12.96 20.29 12.51 17.65 12.83 C 19.00 12.09 20.43 11.59 21.95 11.33 C 23.46 11.07 24.98 11.05 26.50 11.29 C 27.29 11.42 28.07 11.59 28.84 11.80 C 33.87 13.21 35.93 16.24 36.85 22.99 C 36.97 23.88 37.10 24.82 37.24 25.78 C 38.26 33.04 39.65 43 38.61 47.69 C 37.82 51.50 32.89 52.89 30.79 53.30 Z M 40.45 45.98 C 40.57 44.33 40.58 42.68 40.5 41.03 C 46.07 32.34 42.01 8.96 40.45 6.19 C 40.33 5.92 40.14 5.71 39.89 5.56 C 39.64 5.41 39.37 5.33 39.08 5.34 C 37.22 5.41 34.80 9.72 33.50 12.32 C 33.41 12.24 33.30 12.17 33.20 12.10 C 33.44 10.83 33.46 9.56 33.25 8.29 C 33.71 7.24 36.09 2.26 39.85 1.91 C 42.10 1.69 44.28 7.77 46.29 19.95 C 46.44 20.82 46.56 21.53 46.65 22 L 46.75 22.46 C 47.52 26.30 49.77 37.59 40.45 45.98 Z M 40.45 45.98","clip":"be8bc738b1"},{"d":"M 38.02 34.75 C 37.85 34.60 37.64 34.54 37.42 34.57 L 32.35 35.20 C 32.16 35.23 32.00 35.31 31.87 35.45 C 31.74 35.60 31.67 35.76 31.67 35.96 L 31.47 51.61 C 31.46 51.92 31.60 52.16 31.88 52.30 C 31.99 52.37 32.11 52.40 32.25 52.40 C 32.41 52.40 32.57 52.36 32.70 52.26 L 38.19 48.5 C 38.42 48.34 38.53 48.12 38.53 47.85 L 38.28 35.33 C 38.28 35.10 38.19 34.91 38.02 34.75 Z M 33.02 50.14 L 33.21 36.66 L 36.75 36.19 L 36.92 47.44 Z M 33.02 50.14"},{"d":"M 17.15 36.12 C 16.42 36.10 15.71 36.14 14.99 36.26 C 14.28 36.37 13.58 36.55 12.90 36.80 C 12.22 37.05 11.57 37.36 10.95 37.73 C 10.33 38.10 9.75 38.53 9.21 39.01 C 8.67 39.5 8.18 40.02 7.75 40.60 C 7.31 41.17 6.93 41.79 6.60 42.43 C 6.28 43.08 6.03 43.76 5.83 44.45 C 5.64 45.15 5.51 45.86 5.46 46.58 L 5.30 48.57 C 5.28 48.78 5.33 48.96 5.46 49.12 C 5.58 49.28 5.75 49.37 5.95 49.40 L 27.51 52.65 L 27.63 52.65 C 27.83 52.65 28.00 52.58 28.15 52.45 C 28.33 52.28 28.41 52.08 28.40 51.84 L 28.17 46.94 C 28.13 46.24 28.03 45.54 27.86 44.85 C 27.69 44.16 27.46 43.5 27.17 42.85 C 26.88 42.20 26.53 41.59 26.13 41.01 C 25.72 40.42 25.27 39.89 24.76 39.39 C 24.26 38.89 23.71 38.45 23.12 38.05 C 22.53 37.66 21.91 37.32 21.26 37.04 C 20.61 36.76 19.94 36.54 19.25 36.39 C 18.56 36.23 17.86 36.14 17.15 36.12 Z M 6.90 47.98 L 7.00 46.70 C 7.05 46.08 7.16 45.48 7.32 44.88 C 7.48 44.28 7.70 43.71 7.97 43.15 C 8.25 42.59 8.57 42.07 8.94 41.57 C 9.32 41.07 9.73 40.62 10.19 40.20 C 10.65 39.78 11.14 39.41 11.67 39.09 C 12.20 38.77 12.75 38.5 13.33 38.28 C 13.91 38.06 14.51 37.90 15.12 37.79 C 15.73 37.69 16.35 37.64 16.96 37.65 C 17.58 37.66 18.20 37.73 18.80 37.85 C 19.41 37.98 20.00 38.16 20.57 38.40 C 21.15 38.64 21.69 38.92 22.21 39.26 C 22.73 39.61 23.21 39.99 23.65 40.42 C 24.10 40.86 24.50 41.33 24.85 41.83 C 25.21 42.34 25.51 42.88 25.77 43.44 C 26.02 44.01 26.22 44.59 26.37 45.19 C 26.51 45.80 26.60 46.41 26.62 47.03 L 26.81 50.98 Z M 6.90 47.98"},{"d":"M 20.75 43.11 L 12.58 42.05 C 12.37 42.02 12.17 42.07 12.01 42.20 C 11.84 42.33 11.74 42.50 11.71 42.71 C 11.68 42.92 11.73 43.12 11.87 43.28 C 12 43.46 12.17 43.55 12.38 43.58 L 20.54 44.65 L 20.64 44.65 C 20.85 44.65 21.03 44.58 21.19 44.44 C 21.34 44.31 21.42 44.13 21.44 43.92 C 21.45 43.72 21.39 43.53 21.25 43.38 C 21.12 43.22 20.95 43.13 20.75 43.10 Z M 20.75 43.11"},{"d":"M 11.49 26.90 L 24.72 27.36 L 25.09 27.36 C 25.30 27.36 25.49 27.28 25.64 27.13 C 25.79 26.97 25.86 26.78 25.86 26.57 C 25.70 21.16 23.11 18.82 17.14 18.76 L 17.06 18.76 C 12.31 18.76 10.85 23.54 10.75 26.08 C 10.73 26.30 10.80 26.49 10.94 26.65 C 11.09 26.82 11.27 26.90 11.49 26.90 Z M 17.06 20.31 L 17.12 20.31 C 21.91 20.37 23.92 21.87 24.26 25.80 L 12.37 25.38 C 12.62 23.81 13.56 20.33 17.06 20.33 Z M 17.06 20.31"}]},"notas":{"vb":[213.45,2.5,38.7,50.35],"clips":{"30f0da2ebb":"M 238 22 L 252.11 22 L 252.11 51 L 238 51 Z M 238 22","ea4ad7c675":"M 232 2.25 L 246 2.25 L 246 29 L 232 29 Z M 232 2.25"},"paths":[{"d":"M 226.35 33.18 C 226.27 31.65 226.27 30.25 226.09 28.89 C 225.94 28.16 225.68 27.46 225.31 26.82 C 225.03 26.29 224.57 25.88 224.01 25.66 C 224.20 27.54 224.43 29.41 224.57 31.29 C 224.89 35.45 225.21 39.62 225.36 43.78 C 225.39 44.59 224.62 45.45 224.16 46.25 C 222.87 48.55 221.10 50.55 218.98 52.10 C 218.06 52.82 216.82 53.01 215.73 52.59 C 213.39 51.79 212.88 50.68 214.06 48.45 C 214.68 47.18 215.43 45.98 216.29 44.85 C 217.88 42.89 219.79 41.30 222.48 41.16 C 222.82 34.24 221.42 27.62 220.80 21 C 222.83 20.27 222.91 20.26 224.05 21.66 C 225.32 23.22 226.62 24.77 227.77 26.42 C 228.80 27.89 229.12 29.65 229.04 31.42 C 228.95 33.59 228.55 33.81 226.35 33.18 Z M 216.06 50.85 C 218.74 50.04 222.12 45.89 222.00 43.70 C 219.46 44.05 216.61 47.41 216.06 50.85 Z M 216.06 50.85"},{"d":"M 245.54 39.85 C 245.54 37.07 245.50 34.10 245.54 31.14 C 245.58 29.55 245.81 27.93 245.89 26.32 C 245.95 25.21 245.89 24.09 245.89 22.91 C 247.04 22.06 248.25 22.06 248.85 23.14 C 249.92 25.07 250.94 27.05 251.84 29.07 C 252.15 29.81 252.23 30.62 252.09 31.41 C 251.75 33.25 250.82 33.64 248.76 32.94 C 248.98 32.07 249.37 31.18 249.37 30.30 C 249.37 29.5 248.95 28.71 248.71 27.89 L 248.26 27.97 C 248.16 29.96 248.00 31.94 247.96 33.93 C 247.89 36.42 247.88 38.92 247.91 41.41 C 247.93 43.08 247.40 44.59 246.73 46.06 C 245.74 48.25 243.77 49.38 241.73 50.24 C 240.05 50.95 238.25 49.30 238.65 47.50 C 239.37 44.32 241.12 41.87 244.26 40.60 C 244.51 40.50 244.77 40.42 245.02 40.32 C 245.21 40.18 245.38 40.02 245.54 39.85 Z M 241.00 47.89 C 243.87 46.70 244.92 45.17 244.67 42.76 C 242.96 44.05 241.86 45.66 241.00 47.89 Z M 241.00 47.89","clip":"30f0da2ebb"},{"d":"M 241.76 13.72 C 243.78 11.37 241.69 9.94 240.35 8.23 C 240.31 8.76 240.24 9.29 240.23 9.82 C 240.19 13.18 240.28 16.55 240.10 19.92 C 240 21.98 239.91 24.12 238.79 25.96 C 238.33 26.78 237.77 27.55 237.13 28.24 C 236.09 29.17 234.53 29.24 233.42 28.39 C 233.03 28.04 232.81 27.54 232.80 27.02 C 232.98 24.47 233.71 22.15 236.14 20.75 C 237.27 20.11 237.87 19.18 237.82 17.80 C 237.66 13.09 237.56 8.39 237.50 3.68 C 237.54 3.25 237.77 2.87 238.14 2.64 C 238.91 2.27 240.19 2.74 240.62 3.46 C 242.04 5.83 243.49 8.19 244.84 10.59 C 245.18 11.17 245.38 11.83 245.40 12.50 C 245.40 13.38 245.12 14.26 244.20 14.68 C 243.28 15.10 242.52 14.71 241.76 13.72 Z M 237.13 23.42 L 236.54 23.07 L 235.32 26.01 L 235.80 26.23 Z M 237.13 23.42","clip":"ea4ad7c675"}]},"aplus":{"vb":[419.05,6.85,59.2,44.25],"clips":{"7793332d6d":"M 419.03 6.85 L 453 6.85 L 453 51.26 L 419.03 51.26 Z M 419.03 6.85","befecf7b3b":"M 452 7 L 478.24 7 L 478.24 35 L 452 35 Z M 452 7"},"paths":[{"d":"M 421.87 51.08 C 424.53 50.97 427.19 50.56 429.84 50.24 C 430.60 50.15 431.00 49.65 430.96 48.80 C 430.92 47.43 431 44.68 431.01 44.68 C 431.01 43.38 431.01 42.08 431.01 40.78 C 431.01 39.22 431.40 38.62 432.84 38.16 C 433.73 37.87 434.62 37.63 435.53 37.41 C 436.66 37.10 436.79 37.18 437.21 38.40 C 437.39 38.93 437.57 39.46 437.71 39.99 C 438.19 41.79 438.58 43.62 439.12 45.39 C 439.72 47.32 440.75 47.86 442.44 47.32 C 444.67 46.61 447.02 46.27 449.30 45.73 C 449.89 45.58 450.50 45.36 451.03 45.06 C 452.00 44.5 452.32 43.72 451.89 42.71 C 451.29 41.28 450.60 39.88 449.85 38.55 C 448.90 36.88 447.76 35.32 446.82 33.65 C 446.14 32.41 445.67 31.05 445.07 29.75 C 443.06 25.28 440.97 20.84 439.06 16.32 C 437.84 13.43 436.27 10.78 434.39 8.28 C 434.01 7.81 433.53 7.37 433.01 7.08 C 432.21 6.63 431.5 6.92 431.24 7.77 C 430.79 9.25 429.68 13.03 429.55 13.44 C 428.58 16.85 427.64 20.24 426.67 23.65 C 425.75 26.94 424.73 30.21 423.22 33.28 C 422.83 34.05 422.42 34.82 422.16 35.64 C 421.23 38.66 420.34 41.69 419.44 44.73 C 418.99 46.27 418.77 47.72 419.49 49.38 C 420.23 50.94 420.05 51.16 421.87 51.08 Z M 421.58 43.43 C 422.28 41.25 423.01 39.06 423.81 36.91 C 425.14 33.37 426.66 29.89 427.91 26.32 C 428.83 23.68 429.45 20.95 430.24 18.26 C 431.04 15.53 431.16 12.48 432.70 10.10 C 433.44 8.96 435.24 12.60 436.01 14.19 C 437.20 16.66 438.15 19.22 439.27 21.72 C 440.73 24.95 442.26 28.15 443.77 31.35 C 444.43 32.76 445.04 34.19 445.78 35.56 C 446.81 37.47 447.95 39.32 449.05 41.20 C 449.17 41.41 449.33 41.61 449.41 41.84 C 450.01 43.39 449.64 43.93 447.98 44.22 C 446.33 44.51 444.69 44.89 443.05 45.25 C 441.31 45.62 441.01 45.44 440.58 43.72 C 439.98 41.38 439.37 39.03 438.82 36.67 C 438.50 35.23 437.79 34.80 436.36 35.16 C 434.67 35.56 433.03 36.15 431.36 36.62 C 429.95 37.02 429.15 37.78 429.19 39.41 C 429.24 41.70 429.11 44.00 429.05 46.28 C 429.05 46.48 429.02 46.65 429.00 46.85 C 428.85 48.44 428.87 48.48 427.28 48.71 C 425.80 48.92 424.31 49.06 422.83 49.10 C 419.94 49.39 421.40 43.99 421.58 43.43 Z M 421.58 43.43","clip":"7793332d6d"},{"d":"M 472.75 23.76 C 473.98 23.58 475.19 23.35 476.40 23.07 C 478.16 22.66 478.78 21.5 478.25 19.71 C 477.83 18.37 477.70 17.09 478.12 15.69 C 478.58 14.12 477.90 13.49 476.27 13.83 C 474.44 14.21 472.62 14.62 470.82 15.07 C 470.03 15.26 469.65 15.08 469.54 14.26 C 469.30 12.74 468.85 9.67 468.89 9.67 C 468.91 9.48 468.94 9.30 468.94 9.11 C 468.99 7.34 468.36 6.83 466.69 7.26 C 466.21 7.39 465.74 7.55 465.26 7.71 C 464.50 7.95 463.75 8.21 462.98 8.44 C 461.60 8.84 460.19 9.13 458.84 9.62 C 457.48 10.12 457.32 10.49 457.56 11.89 C 457.80 13.35 458.04 14.85 458.51 16.26 C 458.78 17.12 458.76 17.68 458.03 18.16 C 457.51 18.50 457.01 18.87 456.45 19.09 C 455.59 19.44 454.69 19.67 453.80 20.01 C 453.17 20.25 452.69 20.63 452.88 21.41 C 453.38 23.46 453.86 25.52 454.41 27.56 C 454.79 28.99 455.59 29.34 457.12 29.02 C 458.52 28.73 459.94 28.49 461.35 28.33 C 462.72 28.17 463.12 28.52 463.43 29.89 C 463.64 30.81 463.73 31.74 463.99 32.64 C 464.44 34.25 464.92 34.63 466.56 34.28 C 468.38 33.89 470.16 33.31 471.94 32.78 C 472.54 32.60 472.83 32.11 472.75 31.46 C 472.62 30.60 472.47 29.75 472.33 28.87 C 472.12 27.59 471.90 26.30 471.72 25.01 C 471.59 24.24 471.98 23.87 472.75 23.76 Z M 471.09 21.94 C 470.80 21.89 470.48 22.01 470.17 22.07 C 469.51 22.22 469.25 22.61 469.37 23.31 C 469.73 25.19 470.08 27.08 470.42 28.98 C 470.48 29.35 470.53 29.72 470.61 30.09 C 470.77 30.85 470.46 31.31 469.76 31.52 C 468.81 31.81 467.87 32.08 466.90 32.31 C 466.32 32.44 465.94 32.16 465.81 31.58 C 465.53 30.44 465.23 29.30 465.03 28.14 C 464.78 26.57 464.31 26.10 462.70 26.25 C 461.46 26.35 460.26 26.66 459.02 26.80 C 456.69 27.08 456.35 27.90 455.63 24.38 C 455.57 24.07 455.47 23.78 455.41 23.48 C 455.12 22.00 455.25 21.78 456.63 21.25 C 458.19 20.65 459.67 19.89 461.39 19.74 C 462.48 19.64 462.56 19.24 462.03 18.19 C 461.89 17.92 461.73 17.65 461.50 17.46 C 459.94 16.08 459.97 14.16 459.86 12.31 C 459.84 11.99 460.21 11.45 460.52 11.37 C 462.42 10.77 464.35 10.26 466.26 9.76 C 466.75 9.63 466.95 9.97 466.93 10.38 C 466.82 12.34 467.49 14.18 467.91 16.04 C 468 16.41 468.08 16.78 468.25 17.10 C 468.70 18.05 469.34 18.29 470.18 17.66 C 471.77 16.49 473.81 16.94 475.50 16.10 C 475.57 16.07 475.95 16.44 476 16.66 C 476.06 16.95 476.04 19.06 476.17 19.78 C 476.41 21.11 476.41 21.15 475.14 21.42 C 473.79 21.70 472.5 22.18 471.09 21.94 Z M 471.09 21.94","clip":"befecf7b3b"},{"d":"M 433.52 31.08 C 434.74 30.80 436.28 30.51 437.76 30.07 C 439.11 29.67 439.21 29.30 438.50 28.05 C 437.53 26.36 436.81 24.61 436.49 22.67 C 436.33 21.66 435.86 20.66 435.38 19.73 C 435.19 19.36 434.64 19.03 434.20 18.95 C 433.61 18.86 433.5 19.45 433.27 19.92 C 431.94 22.65 431.73 25.67 431.04 28.57 C 430.77 29.60 432.19 31.12 433.52 31.08 Z M 433.23 27.97 C 433.47 26.51 433.74 25.05 434.01 23.60 C 434.05 23.45 434.29 21.86 434.34 21.88 C 434.53 21.96 434.79 23.42 434.83 23.60 C 435.27 25.01 435.70 26.42 436.07 27.86 C 436.12 28.05 435.88 28.45 435.71 28.52 C 435.19 28.71 434.63 28.78 434.08 28.89 C 433.44 28.89 433.12 28.59 433.23 27.97 Z M 433.23 27.97"}]}}};
+  // Posições do design, em px do cartão: tamanho, distância do anterior, ícone [x, y, largura, altura], texto (tx), título e descrição
+  const chatCardLayout = [
+    { page:'resumos',   art:'mochila', frame:'c1', w:200.25, gap:0,    ico:[12.75, 12.75, 47.25, 55.5], tx:78.65, ty:23.71, dx:78.95, dy:43.2, lh:9.75,
+      title:'Resumo',   desc:'Pergunte sobre alguma coisa<br>que queira entender rápido' },
+    { page:'podcasts',  art:'notas',   frame:'c2', w:201,    gap:8.25, ico:[17.25, 15, 39.75, 51],      tx:72.65, ty:22.96, dx:73.7,  dy:41.7, lh:10.5,
+      title:'Podcast',  desc:'Gera um resumo em áudio, para<br>aprender enquanto escuta' },
+    { page:'simulados', art:'aplus',   frame:'c3', w:201,    gap:7.5,  ico:[17.25, 19.5, 60, 45],       tx:89.9,  ty:23.71, dx:90.2,  dy:41.7, lh:9.75,
+      title:'Simulado', desc:'Gera um simulado para<br>testar seus conhecimentos' },
+  ];
+  // Botões do topo: rótulo do design, largura mínima e ajuste vertical do texto de cada moldura (como no design).
+  // Rótulos que não estão no design (os do professor) ganham mais folga para não encostar no traço inclinado.
+  const chatTabLayout = [ { label:'Início', w:60, pb:0.6 }, { label:'Principal', w:59.25, pb:0.6 }, { label:'Estudar', w:57.75, pt:2.4 }, { label:'Progresso', w:60, pt:2.4 } ];
+
+  function chatIconSVG(key, cls, style){
+    const a = chatArt.icons[key];
+    const clips = Object.entries(a.clips).map(([id, d]) => `<clipPath id="sc-${id}"><path d="${d}"/></clipPath>`).join('');
+    const paths = a.paths.map(p => p.clip ? `<g clip-path="url(#sc-${p.clip})"><path d="${p.d}"/></g>` : `<path d="${p.d}"/>`).join('');
+    return `<svg class="${cls}" style="${style}" viewBox="${a.vb.join(' ')}" aria-hidden="true">${clips ? `<defs>${clips}</defs>` : ''}${paths}</svg>`;
+  }
+  function chatFrameSVG(f, cls, shadow){
+    return `<svg class="${cls}" viewBox="0 0 ${f.w} ${f.h}" preserveAspectRatio="none" aria-hidden="true">${shadow ? `<path class="sc-shadow" d="${f.d}" stroke-width="${f.sw}" transform="translate(4 4)"/>` : ''}<path d="${f.d}" stroke-width="${f.sw}"/></svg>`;
+  }
+  function chatCardHTML(c){
+    const u = v => `calc(${v} * var(--cu))`;
+    const [ix, iy, iw, ih] = c.ico;
+    return `<button type="button" onclick="navigate('${c.page}')" class="sc-card" style="width:${u(c.w)};margin-left:${u(c.gap)}">
+      ${chatFrameSVG(chatArt.frames[c.frame], 'sc-frame', true)}
+      ${chatIconSVG(c.art, 'sc-ico', `left:${u(ix)};top:${u(iy)};width:${u(iw)};height:${u(ih)}`)}
+      <span class="sc-title" style="left:${u(c.tx)};top:${u(c.ty)}">${c.title}</span>
+      <span class="sc-desc" style="left:${u(c.dx)};top:${u(c.dy)};line-height:${u(c.lh)}">${c.desc}</span>
+    </button>`;
+  }
+
+  // Cabeçalho do design (o mesmo da Home) com a navegação no centro: Início + seções do perfil
+  function chatHeadHTML(){
+    const def = getDefaultPageForRole(currentRole);
+    const tabs = [{ label:'Início', go:def }];
+    (navConfig[currentRole] || []).forEach((sec, i) => {
+      const items = sec.items.filter(it => it.page !== def && it.page !== 'home');
+      if (items.length) tabs.push({ label:sec.section, items, i });
+    });
+    const nav = tabs.map((t, k) => {
+      const lay = chatTabLayout[k % chatTabLayout.length];
+      const frame = chatFrameSVG(chatArt.tabs[k % chatArt.tabs.length], '', false);
+      const style = `min-width:calc(${lay.w} * var(--hu));--pt:${lay.pt || 0};--pb:${lay.pb || 0};--px:${lay.label === t.label ? 5 : 9}`;
+      if (!t.items) return `<div class="sc-tabw"><button type="button" class="sc-tab" style="${style}" onclick="navigate('${t.go}')">${frame}${t.label}</button></div>`;
+      return `<div class="sc-tabw" onclick="event.stopPropagation()">
+        <button type="button" class="sc-tab" style="${style}" onclick="toggleChatMenu(${t.i})" aria-haspopup="true">${frame}${t.label}</button>
+        <div id="chdrop-${t.i}" class="sc-drop header-dropdown hidden">
+          ${t.items.map(it => `<button type="button" onclick="navigate('${it.page}');closeHeaderMenus()"><span class="text-lg flex-shrink-0">${it.icon}</span>${it.label}</button>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+    const u = homeArt.user;
+    return `<div class="sh-logo"><img src="${homeArt.logo}" alt="EstudAI" /></div>
+      <nav class="sc-nav" aria-label="Navegação">${nav}</nav>
+      <button type="button" class="sh-iconbtn sh-bell" onclick="toggleNotifications()" aria-label="Notificações">
+        <svg viewBox="1112 14 18 22"><path fill-rule="evenodd" transform="matrix(${homeArt.bell.m.join(' ')})" d="${homeArt.bell.d}"/></svg>
+      </button>
+      <button type="button" class="sh-iconbtn sh-user" onclick="event.stopPropagation();toggleAvatarMenu()" aria-label="Conta">
+        <svg viewBox="1144 13 23 23"><g transform="matrix(${u.m.join(' ')})">${u.d.map(d => `<path d="${d}"/>`).join('')}</g></svg>
+      </button>
+      <svg class="sh-line" viewBox="0 44 1187.85 5" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="47.306" x2="1187.85" y2="45.806" stroke="#E7191F" vector-effect="non-scaling-stroke"/></svg>`;
+  }
+  function toggleChatMenu(i){
+    const el = document.getElementById('chdrop-' + i); if (!el) return;
+    const wasHidden = el.classList.contains('hidden');
+    closeHeaderMenus(); closeAvatarMenu();
+    if (wasHidden) el.classList.remove('hidden');
+  }
+
+  let chatRole = null;
+  function renderChat(){
+    const head = document.getElementById('chat-head'); if (!head) return;
+    if (chatRole && chatRole !== currentRole) resetChat(); // outro perfil entrou: não mostra a conversa anterior
+    chatRole = currentRole;
+    head.innerHTML = chatHeadHTML();
+    const cards = document.getElementById('chat-cards');
+    if (cards && !cards.childElementCount) cards.innerHTML = chatCardLayout.map(chatCardHTML).join('');
+    const first = ((document.getElementById('sidebar-name') || {}).textContent || 'João').trim().split(' ')[0];
+    document.getElementById('chat-greeting').textContent = currentRole === 'teacher' ? 'Mão na massa, Professor!' : `Mão na massa, ${first}!`;
+    if (document.getElementById('chat-screen').classList.contains('is-talking')) chatScrollEnd();
+  }
+
   let chatCtx = 'bio';
+  const chatCtxLabels = { bio:'Biologia', mat:'Matemática', qui:'Química', his:'História', fis:'Física' };
   function setChatContext(ctx) {
     chatCtx = ctx;
     document.querySelectorAll('.ctx-btn').forEach(b => {
-      b.className = 'ctx-btn flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-white text-slate-500 border-2 border-slate-200 flex-shrink-0 transition hover:border-slate-300';
+      const on = b.id === 'ctx-' + ctx;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on);
     });
-    const colors = { bio:'apoio1', mat:'apoio3', qui:'apoio2', his:'primary', fis:'apoio1' };
-    const c = colors[ctx] || 'primary';
-    const btn = document.getElementById('ctx-' + ctx);
-    if (btn) btn.className = `ctx-btn flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-${c}/10 text-${c} border-2 border-${c} flex-shrink-0 transition`;
   }
+
+  // Respostas simuladas: cada conversa tem um número, para que respostas atrasadas não caiam numa conversa nova
+  let chatSession = 0, chatPending = 0;
+  function chatMsg(cls, html){
+    const conv = document.getElementById('chat-conversation');
+    const el = document.createElement('div');
+    el.className = 'sc-msg ' + cls;
+    el.innerHTML = html;
+    conv.insertBefore(el, document.getElementById('typing-indicator'));
+    return el;
+  }
+  function chatScrollEnd(){ const box = document.getElementById('chat-messages'); box.scrollTop = box.scrollHeight; }
 
   function sendMessage() {
     const inp = document.getElementById('chat-input');
     const msg = inp.value.trim();
     if (!msg) return;
     inp.value = '';
+    document.getElementById('chat-screen').classList.add('is-talking');
 
-    // Add user bubble
-    const msgs = document.getElementById('chat-messages');
-    const userDiv = document.createElement('div');
-    userDiv.className = 'flex gap-3 max-w-2xl ml-auto flex-row-reverse';
-    userDiv.innerHTML = `
-      <div class="w-8 h-8 rounded-full xp-gradient flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">JS</div>
-      <div class="bg-white rounded-2xl rounded-tr-sm px-4 py-3 border border-primary/20 shadow-sm">
-        <p class="text-sm text-dark">${msg}</p>
-      </div>`;
-    msgs.appendChild(userDiv);
+    const initials = ((document.getElementById('sidebar-avatar') || {}).textContent || 'JS').trim();
+    const me = chatMsg('sc-me', `<div class="sc-av"></div><div class="sc-bubble"><p></p></div>`);
+    me.querySelector('.sc-av').textContent = initials;
+    me.querySelector('p').textContent = msg;
 
-    // Show typing
-    document.getElementById('typing-indicator').classList.remove('hidden');
-    msgs.scrollTop = msgs.scrollHeight;
+    const typing = document.getElementById('typing-indicator');
+    typing.classList.remove('hidden');
+    chatScrollEnd();
 
-    // Fake AI response
+    const session = chatSession, subject = chatCtxLabels[chatCtx] || 'Livro';
+    chatPending++;
     setTimeout(() => {
-      document.getElementById('typing-indicator').classList.add('hidden');
-      const aiDiv = document.createElement('div');
-      aiDiv.className = 'flex gap-3 max-w-2xl';
-      aiDiv.innerHTML = `
-        <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
-        </div>
-        <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm space-y-2 card-soft">
-          <p class="text-sm text-slate-700">Ótima pergunta! Com base no seu livro didático, vou explicar esse conceito de forma clara e precisa, seguindo exatamente o que está no material da sua escola.</p>
-          <div class="flex flex-wrap gap-1.5 mt-1">
-            <span class="inline-flex items-center gap-1 text-xs bg-apoio1/10 text-apoio1 border border-apoio1/20 px-2 py-0.5 rounded-full font-medium"><i data-lucide=book-open class=ico></i> Cap.4 · p.72</span>
+      if (session !== chatSession) return;
+      if (--chatPending === 0) typing.classList.add('hidden');
+      chatMsg('sc-ai', `
+        <div class="sc-av"><svg viewBox="0 0 57 55.4" aria-hidden="true"><path d="${chatArt.mark}"/></svg></div>
+        <div class="sc-bubble">
+          <p>Com base no seu material, essa é uma ótima pergunta. Aqui está a explicação direta do seu livro didático para facilitar os seus estudos.</p>
+          <div class="sc-refs"><span class="sc-ref"><i data-lucide=book-open class=ico></i> ${subject} · Cap.4 · p.72</span></div>
+          <div class="sc-acts">
+            <button type="button" class="sc-act" onclick="navigate('resumos')"><i data-lucide=file-text class=ico></i> Gerar resumo</button>
+            <button type="button" class="sc-act" onclick="navigate('podcasts')"><i data-lucide=mic class=ico></i> Criar podcast</button>
+            <button type="button" class="sc-act" onclick="navigate('simulados')"><i data-lucide=clipboard-list class=ico></i> Montar simulado</button>
           </div>
-          <div class="flex gap-3 pt-1 border-t border-slate-100">
-            <button onclick="navigate('resumos')" class="text-xs text-slate-400 hover:text-apoio3 transition font-medium"><i data-lucide=file-text class=ico></i> Resumo</button>
-            <button onclick="navigate('podcasts')" class="text-xs text-slate-400 hover:text-apoio3 transition font-medium"><i data-lucide=mic class=ico></i> Podcast</button>
-            <button onclick="navigate('simulados')" class="text-xs text-slate-400 hover:text-apoio3 transition font-medium"><i data-lucide=clipboard-list class=ico></i> Simulado</button>
-          </div>
-        </div>`;
-      msgs.appendChild(aiDiv);
-      msgs.scrollTop = msgs.scrollHeight;
-    }, 1800);
-
-    msgs.scrollTop = msgs.scrollHeight;
+        </div>`);
+      chatScrollEnd();
+    }, 1500);
   }
 
+  function resetChat() {
+    chatSession++; chatPending = 0;
+    document.querySelectorAll('#chat-conversation > .sc-msg:not(#typing-indicator)').forEach(el => el.remove());
+    document.getElementById('typing-indicator').classList.add('hidden');
+    document.getElementById('chat-screen').classList.remove('is-talking');
+    document.getElementById('chat-messages').scrollTop = 0;
+  }
+  // O "+" da barra começa uma conversa nova e volta para o estado inicial
   function newChat() {
-    const msgs = document.getElementById('chat-messages');
-    msgs.innerHTML = `
-      <div class="flex gap-3 max-w-2xl">
-        <div class="w-8 h-8 rounded-xl xp-gradient flex items-center justify-center flex-shrink-0 shadow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0m6 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>
-        </div>
-        <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm card-soft">
-          <p class="text-sm text-slate-700">Nova conversa iniciada! <i data-lucide=bot class=ico></i> Selecione a matéria e me faça uma pergunta.</p>
-        </div>
-      </div>`;
+    resetChat();
+    document.getElementById('chat-input').focus();
   }
 
   // ─── Podcast ─────────────────────────────────────────
