@@ -518,6 +518,142 @@
     .cl-add  { position: static; display: block; width: calc(100% - 32px); height: 44px; margin: 16px auto 0; font-size: 15px; }
   }
 </style>
+<style>
+  /* ── Resumos do professor — identidade inspirada na marca da OpenAI (openai.com/brand):
+     fundo branco, tipografia grande e leve com tracking apertado, bordas finas, botões em pílula;
+     o destaque é o vermelho da EstudAI. Só vale com #app-shell.oa-on (professor na tela de Resumos). ── */
+  .oa {
+    --oa-accent: #e7191f;
+    --oa-accent-hover: #c8141a;
+    --oa-ink: #0d0d0d;
+    --oa-muted: #5d5d5d;
+    --oa-faint: #8e8e8e;
+    --oa-line: rgba(0, 0, 0, .1);
+    --oa-surface: #f7f7f7;
+    display: none;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 72px 32px 96px;
+    color: var(--oa-ink);
+  }
+  .oa, .oa * { font-family: 'Inter', sans-serif; }
+  #app-shell.oa-on .oa { display: block; margin-top: 0; }
+  #app-shell.oa-on #page-resumos { padding: 0; background: #fff; }
+  #app-shell.oa-on #page-resumos > :not(.oa) { display: none !important; }
+  #app-shell.oa-on main, #app-shell.oa-on #content-wrap { background: #fff; }
+
+  /* Abertura */
+  .oa-eyebrow { margin: 0; font-size: 14px; font-weight: 500; color: var(--oa-muted); }
+  .oa-h1    { margin: 12px 0 0; font-size: clamp(40px, 6vw, 64px); line-height: 1.05; font-weight: 500; letter-spacing: -.035em; }
+  .oa-lede  { max-width: 560px; margin: 18px 0 0; font-size: 18px; line-height: 1.5; font-weight: 400; letter-spacing: -.01em; color: var(--oa-muted); }
+  .oa-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+
+  /* Botões em pílula */
+  .oa-btn   { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 22px; border: 0; border-radius: 9999px; font-size: 15px; font-weight: 500; letter-spacing: -.01em; cursor: pointer; transition: background-color .15s, color .15s, box-shadow .15s; }
+  .oa-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--oa-accent); }
+  .oa-btn-primary { background: var(--oa-accent); color: #fff; }
+  .oa-btn-primary:hover { background: var(--oa-accent-hover); }
+  .oa-btn-secondary { background: var(--oa-surface); color: var(--oa-ink); box-shadow: inset 0 0 0 1px var(--oa-line); }
+  .oa-btn-secondary:hover { background: #ececec; }
+  .oa-btn-sm { height: 34px; padding: 0 16px; font-size: 14px; }
+  .oa-btn .ico { width: 16px; height: 16px; vertical-align: 0; }
+
+  /* Seções */
+  .oa-section { margin-top: 88px; }
+  .oa-section-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--oa-line); }
+  .oa-h2    { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 500; letter-spacing: -.02em; }
+  .oa-count { font-size: 15px; color: var(--oa-faint); }
+  .oa-head-note { margin-left: auto; font-size: 14px; color: var(--oa-muted); }
+  .oa-tag   { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 9999px; background: var(--oa-surface); box-shadow: inset 0 0 0 1px var(--oa-line); font-size: 12px; font-weight: 500; color: var(--oa-ink); }
+  .oa-tag-accent { background: rgba(231, 25, 31, .08); box-shadow: none; color: var(--oa-accent); }
+
+  /* Cartões dos resumos */
+  .oa-grid  { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 32px; }
+  .oa-card  { display: flex; flex-direction: column; min-height: 248px; padding: 24px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--oa-line); transition: box-shadow .15s; }
+  .oa-card:hover { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .22); }
+  .oa-card-top { display: flex; align-items: center; justify-content: space-between; }
+  .oa-time  { font-size: 13px; color: var(--oa-faint); }
+  .oa-card-t { margin: 28px 0 0; font-size: 20px; line-height: 1.25; font-weight: 500; letter-spacing: -.015em; }
+  .oa-card-d { margin: 10px 0 0; font-size: 15px; line-height: 1.5; color: var(--oa-muted); }
+  .oa-card-foot { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 24px; }
+  .oa-pages { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--oa-faint); }
+  .oa-pages .ico { width: 14px; height: 14px; vertical-align: 0; }
+  .oa-card-foot .oa-btns { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .oa-status { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--oa-ink); }
+  .oa-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--oa-accent); }
+  .oa-new   { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; min-height: 248px; padding: 24px; border: 0; border-radius: 16px; background: var(--oa-surface); text-align: left; cursor: pointer; transition: background-color .15s; }
+  .oa-new:hover { background: #efefef; }
+  .oa-new:focus-visible { outline: none; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--oa-accent); }
+  .oa-plus  { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin-bottom: auto; border-radius: 50%; background: var(--oa-accent); color: #fff; }
+  .oa-plus .ico { width: 18px; height: 18px; vertical-align: 0; }
+  .oa-new-t { font-size: 20px; font-weight: 500; letter-spacing: -.015em; color: var(--oa-ink); }
+  .oa-new-d { margin-top: 6px; font-size: 15px; color: var(--oa-muted); }
+
+  /* Recomendações: lista com divisórias, como as listas do site da OpenAI */
+  .oa-list  { margin: 0; padding: 0; list-style: none; }
+  .oa-row   { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--oa-line); }
+  .oa-row-ico { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--oa-surface); color: var(--oa-ink); }
+  .oa-row-ico .ico { width: 18px; height: 18px; vertical-align: 0; }
+  .oa-row-t { margin: 0; font-size: 17px; font-weight: 500; letter-spacing: -.01em; }
+  .oa-row-d { margin: 4px 0 0; font-size: 15px; line-height: 1.5; color: var(--oa-muted); }
+  .oa-link  { display: inline-flex; align-items: center; gap: 6px; padding: 0; background: none; border: 0; font-size: 15px; font-weight: 500; color: var(--oa-accent); cursor: pointer; white-space: nowrap; }
+  .oa-link:hover { color: var(--oa-accent-hover); text-decoration: underline; text-underline-offset: 4px; }
+  .oa-link .ico { width: 16px; height: 16px; vertical-align: 0; transition: transform .15s; }
+  .oa-link:hover .ico { transform: translateX(2px); }
+
+  /* Cabeçalho da tela no mesmo estilo (só nesta tela do professor) */
+  #app-shell.oa-on #content-wrap > header, #app-shell.oa-on #content-wrap > header *, #app-shell.oa-on .header-dropdown, #app-shell.oa-on .header-dropdown * { font-family: 'Inter', sans-serif; }
+  #app-shell.oa-on #content-wrap > header { height: 64px; padding-top: 0; padding-bottom: 0; background: rgba(255, 255, 255, .92); backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid rgba(0, 0, 0, .08); }
+  #app-shell.oa-on #content-wrap > header .xp-gradient:not(#topbar-avatar) { background: #0d0d0d; border-radius: 8px; }
+  #app-shell.oa-on #content-wrap > header .logo-text { font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: -.02em; color: #0d0d0d; }
+  #app-shell.oa-on #header-nav { gap: 4px; }
+  #app-shell.oa-on #header-nav button { height: 36px; padding: 0 14px; border-radius: 9999px; background: transparent; font-size: 14px; font-weight: 500; color: #5d5d5d; }
+  #app-shell.oa-on #header-nav button:hover { background: #f4f4f4; color: #0d0d0d; }
+  #app-shell.oa-on #header-nav button[class~="bg-primary"], #app-shell.oa-on #header-nav button[class~="bg-primary/10"] { background: #f4f4f4; color: #0d0d0d; }
+  #app-shell.oa-on .header-dropdown { padding: 6px; border-radius: 16px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .08), 0 12px 32px rgba(0, 0, 0, .08); }
+  #app-shell.oa-on .header-dropdown button { height: auto; padding: 10px 12px; border-radius: 10px; color: #0d0d0d; }
+  #app-shell.oa-on .header-dropdown button:hover { background: #f4f4f4; color: #0d0d0d; }
+  #app-shell.oa-on #notif-btn { background: transparent; border-radius: 9999px; }
+  #app-shell.oa-on #notif-btn:hover { background: #f4f4f4; }
+  #app-shell.oa-on #notif-btn svg { color: #0d0d0d; }
+  #app-shell.oa-on #notif-indicator { background: #e7191f; }
+  #app-shell.oa-on #content-wrap > header #topbar-avatar { background: #f4f4f4; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08); color: #0d0d0d; font-weight: 500; }
+  #app-shell.oa-on #content-wrap > header input { border-radius: 9999px; background: #f4f4f4; }
+
+  /* Modal "Gerar" no mesmo estilo quando aberto pelo professor */
+  #generate-modal.oa-modal { background: rgba(0, 0, 0, .32); }
+  #generate-modal.oa-modal, #generate-modal.oa-modal * { font-family: 'Inter', sans-serif; }
+  #generate-modal.oa-modal > div { border-radius: 20px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .06), 0 24px 64px rgba(0, 0, 0, .18); }
+  #generate-modal.oa-modal > div > div:first-child { padding: 24px 24px 0; border: 0; }
+  #generate-modal.oa-modal #modal-title { font-size: 22px; font-weight: 500; letter-spacing: -.02em; color: #0d0d0d; }
+  #generate-modal.oa-modal > div > div:first-child button { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; color: #5d5d5d; }
+  #generate-modal.oa-modal > div > div:first-child button:hover { background: #f4f4f4; color: #0d0d0d; }
+  #generate-modal.oa-modal > div > div:last-child { padding: 24px; }
+  #generate-modal.oa-modal label { font-size: 14px; font-weight: 500; color: #0d0d0d; }
+  #generate-modal.oa-modal select { height: 44px; border-radius: 12px; border-color: rgba(0, 0, 0, .14); font-size: 15px; color: #0d0d0d; }
+  #generate-modal.oa-modal select:focus { border-color: #e7191f; box-shadow: 0 0 0 3px rgba(231, 25, 31, .15); }
+  #generate-modal.oa-modal #modal-extra button { height: 40px; border: 0; border-radius: 9999px; background: #f7f7f7; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1); font-weight: 500; color: #5d5d5d; }
+  #generate-modal.oa-modal #modal-extra button.border-primary { background: rgba(231, 25, 31, .08); box-shadow: inset 0 0 0 1px #e7191f; color: #e7191f; }
+  #generate-modal.oa-modal #modal-generate-btn { height: 48px; margin-top: 8px; padding: 0; border-radius: 9999px; background: #e7191f; box-shadow: none; font-size: 15px; font-weight: 500; transition: background-color .15s; }
+  #generate-modal.oa-modal #modal-generate-btn:hover { background: #c8141a; opacity: 1; }
+
+  @media (max-width: 1023px) {
+    .oa { padding: 48px 24px 112px; }
+    .oa-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .oa { padding: 36px 20px 112px; }
+    .oa-lede { font-size: 16px; }
+    .oa-section { margin-top: 56px; }
+    .oa-grid { grid-template-columns: 1fr; gap: 16px; }
+    .oa-card, .oa-new { min-height: 0; }
+    .oa-new .oa-plus { margin-bottom: 32px; }
+    .oa-row  { grid-template-columns: 40px minmax(0, 1fr); }
+    .oa-row .oa-link { grid-column: 2; }
+    .oa-head-note { display: none; }
+  }
+</style>
 </head>
 <body class="bg-fundo text-dark antialiased">
 
@@ -923,6 +1059,72 @@
               <button onclick="upgradeToPro()" class="mt-3 px-4 py-2 xp-gradient text-white rounded-xl text-xs font-semibold">Fazer upgrade para o Pro</button>
             </div>
           </div>
+        </div>
+        <!-- Resumos · professor (identidade inspirada na OpenAI; aparece só com #app-shell.oa-on) -->
+        <div class="oa fade-up" id="resumos-oa">
+          <p class="oa-eyebrow">Estudar</p>
+          <h1 class="oa-h1">Resumos</h1>
+          <p class="oa-lede">Gerados por IA com base nos livros da sua turma, prontos para revisar e publicar.</p>
+          <div class="oa-actions">
+            <button type="button" class="oa-btn oa-btn-primary" onclick="openGenerateModal('resumo')"><i data-lucide=plus class=ico></i> Novo resumo</button>
+            <button type="button" class="oa-btn oa-btn-secondary" onclick="navigate('biblioteca-admin')">Ver livros da turma</button>
+          </div>
+
+          <section class="oa-section" aria-labelledby="oa-mine">
+            <div class="oa-section-head"><h2 class="oa-h2" id="oa-mine">Seus resumos</h2><span class="oa-count">2</span></div>
+            <div class="oa-grid">
+              <article class="oa-card">
+                <div class="oa-card-top"><span class="oa-tag">Biologia</span><span class="oa-time">há 2h</span></div>
+                <h3 class="oa-card-t">Mitose e Meiose</h3>
+                <p class="oa-card-d">Divisão celular mitótica e meiótica: diferenças, etapas e importância biológica.</p>
+                <div class="oa-card-foot">
+                  <span class="oa-pages"><i data-lucide=book-open class=ico></i> p.87–102</span>
+                  <div class="oa-btns">
+                    <button type="button" class="oa-btn oa-btn-secondary oa-btn-sm">Editar</button>
+                    <button type="button" class="oa-btn oa-btn-primary oa-btn-sm">Publicar</button>
+                  </div>
+                </div>
+              </article>
+              <article class="oa-card">
+                <div class="oa-card-top"><span class="oa-tag">Matemática</span><span class="oa-time">ontem</span></div>
+                <h3 class="oa-card-t">Funções do 2º Grau</h3>
+                <p class="oa-card-d">Definição, vértice, discriminante e análise gráfica da parábola.</p>
+                <div class="oa-card-foot">
+                  <span class="oa-pages"><i data-lucide=book-open class=ico></i> p.45–60</span>
+                  <div class="oa-btns">
+                    <button type="button" class="oa-btn oa-btn-secondary oa-btn-sm">Editar</button>
+                    <span class="oa-status">Publicado</span>
+                  </div>
+                </div>
+              </article>
+              <button type="button" class="oa-new" onclick="openGenerateModal('resumo')">
+                <span class="oa-plus"><i data-lucide=plus class=ico></i></span>
+                <span class="oa-new-t">Gerar novo resumo</span>
+                <span class="oa-new-d">Escolha um capítulo do livro</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="oa-section" aria-labelledby="oa-reco">
+            <div class="oa-section-head"><h2 class="oa-h2" id="oa-reco">Recomendados pela IA</h2><span class="oa-tag oa-tag-accent">Plano Pro</span><span class="oa-head-note">Sugestões baseadas na performance da turma</span></div>
+            <ul class="oa-list">
+              <li class="oa-row">
+                <span class="oa-row-ico"><i data-lucide=ruler class=ico></i></span>
+                <div><p class="oa-row-t">Funções do 2º Grau</p><p class="oa-row-d">A turma demonstrou dificuldade em vértice e interpretação gráfica.</p></div>
+                <button type="button" class="oa-link" onclick="openGenerateModal('resumo')">Gerar resumo <i data-lucide=arrow-right class=ico></i></button>
+              </li>
+              <li class="oa-row">
+                <span class="oa-row-ico"><i data-lucide=dna class=ico></i></span>
+                <div><p class="oa-row-t">Meiose</p><p class="oa-row-d">Os erros recentes indicam confusão entre mitose e meiose.</p></div>
+                <button type="button" class="oa-link" onclick="openGenerateModal('resumo')">Gerar resumo <i data-lucide=arrow-right class=ico></i></button>
+              </li>
+              <li class="oa-row">
+                <span class="oa-row-ico"><i data-lucide=flask-round class=ico></i></span>
+                <div><p class="oa-row-t">Ligações Iônicas</p><p class="oa-row-d">A turma ainda não revisou este capítulo esta semana.</p></div>
+                <button type="button" class="oa-link" onclick="openGenerateModal('resumo')">Gerar resumo <i data-lucide=arrow-right class=ico></i></button>
+              </li>
+            </ul>
+          </section>
         </div>
       </div>
 
@@ -3124,6 +3326,7 @@
     // A home do aluno tem cabeçalho próprio (do design), então o topo padrão some só nela
     document.getElementById('app-shell').classList.toggle('sh-on', page === 'home' && currentRole === 'student');
     document.getElementById('app-shell').classList.toggle('sc-on', page === 'chat' || page === 'biblioteca' || page === 'calendario');
+    document.getElementById('app-shell').classList.toggle('oa-on', page === 'resumos' && currentRole === 'teacher');
     if (page === 'chat') renderChat();
     if (page === 'calendario') renderCalendar();
     if (page === 'biblioteca') renderLibrary();
@@ -4096,6 +4299,7 @@
   // ─── Generate Modal ──────────────────────────────────
   function openGenerateModal(type) {
     const labels = { resumo:'Gerar novo resumo', podcast:'Gerar novo podcast', simulado:'Criar novo simulado' };
+    document.getElementById('generate-modal').classList.toggle('oa-modal', currentRole === 'teacher'); // professor: estilo da tela de Resumos
     document.getElementById('modal-title').textContent = labels[type] || 'Gerar conteúdo';
     const extra = document.getElementById('modal-extra');
     if (type === 'simulado') {
