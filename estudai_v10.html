@@ -429,11 +429,11 @@
   }
   .cl-main  { width: calc(1108.5 * var(--cu)); margin: 0 auto; padding: calc(73.9 * var(--cu)) 0 calc(36 * var(--cu)); }
   .cl-head  { width: calc(993 * var(--cu)); margin: 0 auto; }
-  .cl-row   { position: relative; left: calc(1.5 * var(--cu)); display: flex; align-items: flex-start; gap: calc(27.75 * var(--cu)); margin-top: calc(25 * var(--cu)); }
+  .cl-row   { position: relative; left: calc(1.5 * var(--cu)); display: flex; align-items: stretch; gap: calc(27.75 * var(--cu)); margin-top: calc(25 * var(--cu)); }
   .cl-month-t, .cl-day, .cl-day-ev, .cl-ev-t, .cl-add, #calendar-detail-modal p, #calendar-event-modal p, #double-xp-modal p, #double-xp-events-section h3 { font-family: 'Raleway', sans-serif; }
 
   /* Painéis: contorno preto arredondado e linha separando o cabeçalho */
-  .cl-panel { position: relative; flex: none; height: calc(437.25 * var(--cu)); border-radius: calc(5.25 * var(--cu)); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #000; background: #fff; }
+  .cl-panel { position: relative; flex: none; min-height: calc(437.25 * var(--cu)); border-radius: calc(5.25 * var(--cu)); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #000; background: #fff; }
   .cl-cal   { width: calc(801.75 * var(--cu)); }
   .cl-evs   { width: calc(279 * var(--cu)); }
   .cl-bar   { position: relative; display: flex; align-items: center; justify-content: center; height: calc(32.25 * var(--cu)); }
@@ -446,7 +446,8 @@
   .cl-next  { right: calc(14 * var(--cu)); }
 
   /* Grade do mês: 7 colunas de quadradinhos arredondados com o número em vermelho */
-  .cl-grid  { display: grid; grid-template-columns: repeat(7, calc(94.5 * var(--cu))); column-gap: calc(14.6 * var(--cu)); row-gap: calc(10.05 * var(--cu)); margin: calc(20.25 * var(--cu)) 0 0 calc(32.25 * var(--cu)); }
+  .cl-week  { display: grid; grid-template-columns: repeat(7, calc(94.5 * var(--cu))); column-gap: calc(14.6 * var(--cu)); margin: calc(13 * var(--cu)) 0 0 calc(32.25 * var(--cu)); font-family: 'Raleway', sans-serif; font-size: calc(8.5 * var(--cu)); line-height: 1; font-weight: 700; color: #000; text-align: center; }
+  .cl-grid  { display: grid; grid-template-columns: repeat(7, calc(94.5 * var(--cu))); column-gap: calc(14.6 * var(--cu)); row-gap: calc(10.05 * var(--cu)); margin: calc(6.5 * var(--cu)) 0 calc(14 * var(--cu)) calc(32.25 * var(--cu)); }
   .cl-day   { position: relative; display: block; height: calc(64.5 * var(--cu)); padding: 0; background: #fff; border: 0; border-radius: calc(6 * var(--cu)); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #000; font-size: calc(10.5 * var(--cu)); line-height: 1; font-weight: 500; color: #E7191F; text-align: left; }
   .cl-day > span:first-child { position: absolute; left: calc(9.5 * var(--cu)); top: calc(5 * var(--cu)); }
   .cl-day.is-empty { box-shadow: none; }
@@ -505,11 +506,12 @@
     .cl-bar  { height: 46px; }
     .cl-month-t { font-size: 20px; }
     .cl-nav svg { width: 18px; height: 18px; }
-    .cl-grid { grid-template-columns: repeat(7, 1fr); column-gap: 6px; row-gap: 6px; margin: 16px 12px 0; }
+    .cl-week { grid-template-columns: repeat(7, 1fr); column-gap: 6px; margin: 14px 12px 0; font-size: 11px; }
+    .cl-grid { grid-template-columns: repeat(7, 1fr); column-gap: 6px; row-gap: 6px; margin: 8px 12px 0; }
     .cl-day  { height: auto; aspect-ratio: 94.5 / 64.5; border-radius: 7px; box-shadow: inset 0 0 0 1.5px #000; font-size: 12px; }
     .cl-day > span:first-child { left: 6px; top: 5px; }
-    .cl-day-ev { top: 62%; padding: 3px 5px; border-radius: 4px; max-width: calc(100% - 8px); box-shadow: 0 0 0 1px rgba(255, 138, 61, .35), 0 0 5px rgba(255, 122, 40, .55); }
-    .cl-day-ev svg { height: 11px; }
+    .cl-day-ev { left: auto; top: auto; right: 3px; bottom: 3px; transform: none; padding: 2px 3px; border-radius: 4px; max-width: calc(100% - 8px); box-shadow: 0 0 0 1px rgba(255, 138, 61, .35), 0 0 5px rgba(255, 122, 40, .55); }
+    .cl-day-ev svg { height: 8px; }
     .cl-day-ev > span { display: none; }
     .cl-list { padding: 16px 16px 0; }
     .cl-ev   { --cu: min(1.45px, calc((100vw - 64px) / 243)); }
@@ -737,6 +739,7 @@
                   <h3 class="cl-month-t" id="calendar-month-label">Outubro</h3>
                   <button type="button" class="cl-nav cl-next" onclick="changeCalendarMonth(1)" aria-label="Próximo mês"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
                 </div>
+                <div class="cl-week" aria-hidden="true"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
                 <div class="cl-grid" id="calendar-grid"></div>
               </section>
               <section class="cl-panel cl-evs" aria-label="Próximos eventos">
