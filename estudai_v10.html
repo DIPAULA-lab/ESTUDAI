@@ -432,12 +432,12 @@
   .cl-row   { position: relative; left: calc(1.5 * var(--cu)); display: flex; align-items: flex-start; gap: calc(27.75 * var(--cu)); margin-top: calc(25 * var(--cu)); }
   .cl-month-t, .cl-day, .cl-day-ev, .cl-ev-t, .cl-add, #calendar-detail-modal p, #calendar-event-modal p, #double-xp-modal p, #double-xp-events-section h3 { font-family: 'Raleway', sans-serif; }
 
-  /* Painéis: contorno preto arredondado; a linha do cabeçalho passa um pouco do painel à esquerda, como no design */
+  /* Painéis: contorno preto arredondado e linha separando o cabeçalho */
   .cl-panel { position: relative; flex: none; height: calc(437.25 * var(--cu)); border-radius: calc(5.25 * var(--cu)); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #000; background: #fff; }
   .cl-cal   { width: calc(801.75 * var(--cu)); }
   .cl-evs   { width: calc(279 * var(--cu)); }
   .cl-bar   { position: relative; display: flex; align-items: center; justify-content: center; height: calc(32.25 * var(--cu)); }
-  .cl-bar::after { content: ''; position: absolute; left: calc(-4.5 * var(--cu)); right: 0; bottom: calc(-0.75 * var(--cu)); height: calc(1.5 * var(--cu)); background: #000; }
+  .cl-bar::after { content: ''; position: absolute; left: 0; right: 0; bottom: calc(-0.75 * var(--cu)); height: calc(1.5 * var(--cu)); background: #000; }
   .cl-month-t { margin: 0; padding-top: calc(0.6 * var(--cu)); font-size: calc(16.73 * var(--cu)); line-height: 1; font-weight: 700; color: #E7191F; }
   .cl-nav   { position: absolute; top: 50%; display: flex; padding: calc(4 * var(--cu)); background: none; border: 0; color: #000; cursor: pointer; transform: translateY(-50%); transition: color .15s; }
   .cl-nav:hover { color: #E7191F; }
@@ -452,7 +452,10 @@
   .cl-day.is-empty { box-shadow: none; }
   button.cl-day { cursor: pointer; transition: transform .12s, box-shadow .12s; }
   button.cl-day:hover { transform: translate(calc(-1.5 * var(--cu)), calc(-1.5 * var(--cu))); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #000, calc(3 * var(--cu)) calc(3 * var(--cu)) 0 #000; }
-  .cl-day-ev { position: absolute; left: calc(9.5 * var(--cu)); right: calc(7 * var(--cu)); bottom: calc(7 * var(--cu)); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: calc(8 * var(--cu)); line-height: 1.15; font-weight: 700; color: #E7191F; }
+  /* Evento no dia: pílula vermelha centralizada, com um brilho laranja suave em volta (como no Google Agenda) */
+  .cl-day-ev { position: absolute; left: 50%; top: 56%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: calc(3 * var(--cu)); max-width: calc(100% - 9 * var(--cu)); padding: calc(3.4 * var(--cu)) calc(4.5 * var(--cu)); border-radius: calc(4 * var(--cu)); background: #E7191F; box-shadow: 0 0 0 calc(1.5 * var(--cu)) rgba(255, 138, 61, .35), 0 0 calc(7 * var(--cu)) rgba(255, 122, 40, .55); font-size: calc(7.5 * var(--cu)); line-height: 1; font-weight: 700; color: #fff; white-space: nowrap; }
+  .cl-day-ev svg { flex: none; width: auto; height: calc(8 * var(--cu)); fill: #fff; }
+  .cl-day-ev > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 
   /* Próximos eventos */
   .cl-list  { display: flex; flex-direction: column; gap: calc(15 * var(--cu)); padding: calc(22.5 * var(--cu)) calc(18 * var(--cu)) 0; }
@@ -505,7 +508,9 @@
     .cl-grid { grid-template-columns: repeat(7, 1fr); column-gap: 6px; row-gap: 6px; margin: 16px 12px 0; }
     .cl-day  { height: auto; aspect-ratio: 94.5 / 64.5; border-radius: 7px; box-shadow: inset 0 0 0 1.5px #000; font-size: 12px; }
     .cl-day > span:first-child { left: 6px; top: 5px; }
-    .cl-day-ev { left: 6px; right: 4px; bottom: 4px; font-size: 9px; -webkit-line-clamp: 1; }
+    .cl-day-ev { top: 62%; padding: 3px 5px; border-radius: 4px; max-width: calc(100% - 8px); box-shadow: 0 0 0 1px rgba(255, 138, 61, .35), 0 0 5px rgba(255, 122, 40, .55); }
+    .cl-day-ev svg { height: 11px; }
+    .cl-day-ev > span { display: none; }
     .cl-list { padding: 16px 16px 0; }
     .cl-ev   { --cu: min(1.45px, calc((100vw - 64px) / 243)); }
     .cl-add  { position: static; display: block; width: calc(100% - 32px); height: 44px; margin: 16px auto 0; font-size: 15px; }
@@ -4479,7 +4484,7 @@
         .map((e, idx) => ({ e, idx, p: parseEventDate(e) }))
         .filter(o => o.p.day === d && o.p.month === calendarMonth && o.p.year === calendarYear);
       cells += dayEvents.length
-        ? `<button type="button" class="cl-day" onclick="openCalendarEventDetail(${dayEvents[0].idx})" aria-label="${d}: ${dayEvents.map(o => o.e.title).join(', ')}"><span>${d}</span><span class="cl-day-ev">${dayEvents.map(o => o.e.title).join(' · ')}</span></button>`
+        ? `<button type="button" class="cl-day" onclick="openCalendarEventDetail(${dayEvents[0].idx})" aria-label="${d}: ${dayEvents.map(o => o.e.title).join(', ')}"><span>${d}</span><span class="cl-day-ev">${calIconSVG(dayEvents[0].e.art, '', '')}<span>${dayEvents.map(o => o.e.title).join(' · ')}</span></span></button>`
         : `<div class="cl-day"><span>${d}</span></div>`;
     }
     grid.innerHTML = cells;
