@@ -519,6 +519,53 @@
   }
 </style>
 <style>
+  /* Cabeçalho global (66px de altura): os painéis de notificações e da conta abrem logo abaixo dele */
+  #notif-panel, #avatar-menu { top: 74px; }
+
+  /* ── Resumos do aluno — mesmo quadro e mesmos livros da Biblioteca (raiz .lb), com o botão "Gerar resumo"
+     no lugar dos atalhos e a lista de resumos já gerados embaixo. ── */
+  .rs .lb-main  { padding-top: calc(70.9 * var(--cu)); }
+  .rs .lb-h1    { margin-left: calc(0.65 * var(--cu)); }
+  .rs .lb-sub   { margin: calc(5.85 * var(--cu)) 0 0 0; }
+  .rs .lb-grid  { margin-top: calc(63.25 * var(--cu)); }
+  .rs .lb-cover { cursor: pointer; }
+  .rs-gen   { display: block; width: 100%; height: calc(24.75 * var(--cu)); margin-top: calc(15.35 * var(--cu)); padding: 0; background: #E7191F; border: 0; border-radius: calc(3.75 * var(--cu)); font-family: 'Raleway', sans-serif; font-size: calc(12.7 * var(--cu)); line-height: 1; font-weight: 700; color: #fff; cursor: pointer; transition: background-color .15s, transform .12s, box-shadow .12s; }
+  .rs-gen:hover { background: #C8141A; transform: translate(calc(-1.5 * var(--cu)), calc(-1.5 * var(--cu))); box-shadow: calc(3 * var(--cu)) calc(3 * var(--cu)) 0 #000; }
+
+  /* Resumos gerados anteriormente */
+  .rs-sec   { margin: calc(63.5 * var(--cu)) 0 0 calc(0.4 * var(--cu)); font-family: 'Raleway', sans-serif; font-size: calc(16.75 * var(--cu)); line-height: 1; font-weight: 700; color: #000; }
+  .rs-hist  { display: grid; grid-template-columns: repeat(2, calc(320.25 * var(--cu))); column-gap: calc(12.75 * var(--cu)); row-gap: calc(12.75 * var(--cu)); margin-top: calc(13.1 * var(--cu)); }
+  .rs-hcard { display: grid; grid-template-columns: calc(77.25 * var(--cu)) minmax(0, 1fr); grid-template-rows: auto 1fr auto; column-gap: calc(6 * var(--cu)); min-height: calc(89.25 * var(--cu)); padding: calc(14.25 * var(--cu)) calc(12.75 * var(--cu)) calc(9.75 * var(--cu)) calc(10.5 * var(--cu)); box-sizing: border-box; border-radius: calc(4.5 * var(--cu)); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #000; background: #fff; }
+  .rs-hcard, .rs-hcard * { font-family: 'Inter', sans-serif; font-variation-settings: 'opsz' 32; }
+  .rs-tag   { display: flex; align-items: center; justify-content: center; height: calc(18 * var(--cu)); border-radius: calc(3.75 * var(--cu)); background: #E7191F; font-size: calc(8.6 * var(--cu)); font-weight: 700; letter-spacing: .02em; color: #fff; }
+  .rs-pg    { grid-column: 1; margin: calc(5.6 * var(--cu)) 0 0; font-size: calc(8.95 * var(--cu)); line-height: 1; color: #333; text-align: right; }
+  .rs-ttl   { grid-column: 2; grid-row: 1; display: flex; align-items: center; height: calc(18 * var(--cu)); margin: 0; padding: 0 calc(5.25 * var(--cu)); border-radius: calc(4.5 * var(--cu)); box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #E7191F; font-size: calc(8.6 * var(--cu)); font-weight: 700; color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rs-desc  { grid-column: 2; grid-row: 2; margin: calc(5.6 * var(--cu)) 0 0 calc(5.25 * var(--cu)); font-size: calc(8.95 * var(--cu)); line-height: calc(11.25 * var(--cu)); color: #333; }
+  .rs-acts  { grid-column: 1 / 3; grid-row: 3; display: flex; justify-content: flex-end; gap: calc(4.5 * var(--cu)); margin-top: calc(3 * var(--cu)); }
+  .rs-btn   { width: calc(97 * var(--cu)); height: calc(16.5 * var(--cu)); padding: 0; border: 0; border-radius: calc(4.5 * var(--cu)); font-size: calc(9.1 * var(--cu)); font-weight: 700; cursor: pointer; transition: background-color .15s, color .15s; }
+  .rs-btn-o { background: #fff; box-shadow: inset 0 0 0 calc(1.5 * var(--cu)) #E7191F; color: #E7191F; }
+  .rs-btn-o:hover { background: #FDECEC; }
+  .rs-btn-f { background: #E7191F; color: #fff; }
+  .rs-btn-f:hover { background: #C8141A; }
+
+  /* Celular: lista em uma coluna; os textos já crescem com a escala do celular da Biblioteca */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .rs .lb-main { width: calc(653.25 * var(--cu)); }
+    .rs .lb-grid { grid-template-columns: repeat(2, calc(230.25 * var(--cu))); justify-content: center; }
+  }
+  @media (max-width: 767px) {
+    .rs .lb-main { padding-top: 28px; }
+    .rs .lb-h1 { margin-left: 0; }
+    .rs .lb-sub { margin-top: 8px; }
+    .rs .lb-grid { margin-top: 28px; }
+    .rs-gen  { font-size: 15px; height: 44px; }
+    .rs-sec  { margin: 40px 0 0; font-size: 22px; }
+    .rs-hist { grid-template-columns: minmax(0, 1fr); margin-top: 16px; }
+    .rs-hcard { --cu: min(1.15px, calc((100vw - 32px) / 320.25)); }
+    .rs-btn  { width: auto; padding: 0 12px; }
+  }
+</style>
+<style>
   /* ── Resumos do professor — identidade inspirada na marca da OpenAI (openai.com/brand):
      fundo branco, tipografia grande e leve com tracking apertado, bordas finas, botões em pílula;
      o destaque é o vermelho da EstudAI. Só vale com #app-shell.oa-on (professor na tela de Resumos). ── */
@@ -605,20 +652,19 @@
   /* Cabeçalho da tela no mesmo estilo (só nesta tela do professor) */
   #app-shell.oa-on #content-wrap > header, #app-shell.oa-on #content-wrap > header *, #app-shell.oa-on .header-dropdown, #app-shell.oa-on .header-dropdown * { font-family: 'Inter', sans-serif; }
   #app-shell.oa-on #content-wrap > header { height: 64px; padding-top: 0; padding-bottom: 0; background: rgba(255, 255, 255, .92); backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid rgba(0, 0, 0, .08); }
-  #app-shell.oa-on #content-wrap > header .xp-gradient:not(#topbar-avatar) { background: #0d0d0d; border-radius: 8px; }
+  #app-shell.oa-on #content-wrap > header svg { color: #0d0d0d; }
   #app-shell.oa-on #content-wrap > header .logo-text { font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: -.02em; color: #0d0d0d; }
   #app-shell.oa-on #header-nav { gap: 4px; }
-  #app-shell.oa-on #header-nav button { height: 36px; padding: 0 14px; border-radius: 9999px; background: transparent; font-size: 14px; font-weight: 500; color: #5d5d5d; }
+  #app-shell.oa-on #header-nav button { height: 36px; padding: 0 14px; border-color: transparent; border-radius: 9999px; background: transparent; box-shadow: none; font-size: 14px; font-weight: 500; color: #5d5d5d; }
   #app-shell.oa-on #header-nav button:hover { background: #f4f4f4; color: #0d0d0d; }
-  #app-shell.oa-on #header-nav button[class~="bg-primary"], #app-shell.oa-on #header-nav button[class~="bg-primary/10"] { background: #f4f4f4; color: #0d0d0d; }
-  #app-shell.oa-on .header-dropdown { padding: 6px; border-radius: 16px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .08), 0 12px 32px rgba(0, 0, 0, .08); }
+  #app-shell.oa-on #header-nav button[class~="border-[#e7191f]"] { background: #f4f4f4; color: #0d0d0d; }
+  #app-shell.oa-on .header-dropdown { padding: 6px; border: 0; border-radius: 16px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .08), 0 12px 32px rgba(0, 0, 0, .08); }
   #app-shell.oa-on .header-dropdown button { height: auto; padding: 10px 12px; border-radius: 10px; color: #0d0d0d; }
   #app-shell.oa-on .header-dropdown button:hover { background: #f4f4f4; color: #0d0d0d; }
-  #app-shell.oa-on #notif-btn { background: transparent; border-radius: 9999px; }
+  #app-shell.oa-on #notif-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: transparent; border-radius: 9999px; }
   #app-shell.oa-on #notif-btn:hover { background: #f4f4f4; }
   #app-shell.oa-on #notif-btn svg { color: #0d0d0d; }
-  #app-shell.oa-on #notif-indicator { background: #e7191f; }
-  #app-shell.oa-on #content-wrap > header #topbar-avatar { background: #f4f4f4; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08); color: #0d0d0d; font-weight: 500; }
+  #app-shell.oa-on #notif-indicator { top: 6px; right: 6px; width: 8px; height: 8px; border-width: 0; background: #e7191f; }
   #app-shell.oa-on #content-wrap > header input { border-radius: 9999px; background: #f4f4f4; }
 
   /* Modal "Gerar" no mesmo estilo quando aberto pelo professor */
@@ -760,46 +806,35 @@
   <!-- ── MAIN AREA ── -->
   <div id="content-wrap" class="flex-1 flex flex-col">
 
-    <!-- TOPBAR -->
-    <header class="bg-white border-b border-slate-200 px-4 lg:px-6 py-3 flex items-center gap-3 sticky top-0 z-20">
-      <!-- Mobile logo -->
-      <div class="lg:hidden flex items-center gap-2 mr-1">
-        <div class="w-8 h-8 rounded-lg xp-gradient flex items-center justify-center">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-        </div>
-        <span class="logo-text text-lg font-semibold text-dark">EstudAI</span>
+    <!-- TOPBAR GLOBAL (telas sem o cabeçalho do design; a Home do aluno, o Chat, a Biblioteca, o Calendário e os Resumos do aluno usam o do design) -->
+    <header id="global-header" class="bg-white border-b-[2.5px] border-[#e7191f] px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+
+      <!-- Logo Esquerda (Fixada em #e7191f) -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="navigate(getDefaultPageForRole(currentRole))">
+        <svg class="w-8 h-8 text-[#e7191f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 12 12 17 22 12"></polyline>
+          <polyline points="2 17 12 22 22 17"></polyline>
+        </svg>
+        <span class="logo-text text-xl font-extrabold text-[#e7191f] tracking-tight">EstudAI</span>
       </div>
+      <h1 id="section-title" class="hidden"></h1>
 
-      <!-- Desktop logo -->
-      <div class="hidden lg:flex items-center gap-2 mr-1">
-        <div class="w-8 h-8 rounded-lg xp-gradient flex items-center justify-center">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-        </div>
-        <span class="logo-text text-lg font-semibold text-dark">EstudAI</span>
-      </div>
-      <h1 id="section-title" class="text-sm font-semibold text-dark hidden"></h1>
+      <!-- Navegação Central (Preenchida pelo JS) -->
+      <nav id="header-nav" class="hidden lg:flex items-center gap-4 absolute left-1/2 -translate-x-1/2"></nav>
 
-      <!-- Search -->
-      <div class="flex-1 max-w-sm mx-auto lg:hidden">
-        <div class="relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input type="text" placeholder="Buscar conteúdo, matérias..." class="w-full pl-9 pr-4 py-2 bg-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/25 focus:bg-white transition border border-transparent focus:border-primary/25" />
-        </div>
-      </div>
-
-      <nav id="header-nav" class="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-1 z-10"></nav>
-
-      <!-- Right -->
-      <div class="flex items-center gap-2 ml-auto">
-        <div id="hdr-xp" class="hidden sm:flex items-center gap-1.5 xp-gradient text-white text-xs font-semibold px-3 py-1.5 rounded-full"><i data-lucide=zap class=ico></i> 1.240 XP</div>
-        <div id="hdr-streak" class="hidden sm:flex items-center gap-1 bg-orange-50 border border-orange-200 text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full"><i data-lucide=flame class=ico></i> 7</div>
-        <!-- Notifications -->
-        <button onclick="toggleNotifications()" class="relative w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition" id="notif-btn">
-          <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-          <span class="notif-dot" id="notif-indicator"></span>
+      <!-- Ícones Direita -->
+      <div class="flex items-center gap-5">
+        <!-- Sininho com notificação não lida -->
+        <button onclick="toggleNotifications()" id="notif-btn" class="text-black hover:text-[#e7191f] transition-colors relative" aria-label="Notificações">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <!-- Bolinha de Notificação -->
+          <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-[#e7191f] border-2 border-white rounded-full" id="notif-indicator"></span>
         </button>
         <!-- Avatar -->
-        <div onclick="event.stopPropagation();toggleAvatarMenu()" class="w-9 h-9 rounded-full xp-gradient flex items-center justify-center text-white font-semibold text-sm cursor-pointer" id="topbar-avatar">JS</div>
+        <button onclick="event.stopPropagation();toggleAvatarMenu()" class="text-black hover:text-[#e7191f] transition-colors" aria-label="Conta">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg>
+        </button>
       </div>
     </header>
 
@@ -979,85 +1014,16 @@
       </div>
 
       <!-- ── RESUMOS ── -->
-      <div id="page-resumos" class="page p-5 lg:p-8 space-y-6">
-        <div class="flex items-center justify-between">
-          <div><h2 class="text-xl font-semibold">Resumos</h2><p class="text-sm text-slate-500">Gerados por IA com base nos seus livros</p></div>
-          <button onclick="openGenerateModal('resumo')" class="xp-gradient text-white text-sm font-semibold px-4 py-2 rounded-xl hover:opacity-90 transition shadow-md shadow-primary/30">+ Novo resumo</button>
-        </div>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          <div class="bg-white rounded-2xl p-6 card-hover cursor-pointer card-soft">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-apoio1 bg-apoio1/10 px-2 py-0.5 rounded-full">Biologia</span>
-              <span class="text-xs text-slate-400">há 2h</span>
-            </div>
-            <h4 class="font-semibold text-sm">Mitose e Meiose</h4>
-            <p class="text-xs text-slate-500 mt-1 line-clamp-2">Divisão celular mitótica e meiótica: diferenças, etapas e importância biológica...</p>
-            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
-              <span class="text-xs text-slate-400 font-medium"><i data-lucide=book-open class=ico></i> p.87–102</span>
-              <div class="ml-auto flex gap-2">
-                <button class="text-xs text-apoio3 hover:underline font-medium">Editar</button>
-                <button class="text-xs text-primary hover:underline font-medium">Publicar</button>
-              </div>
-            </div>
-          </div>
-          <div class="bg-white rounded-2xl p-6 card-hover cursor-pointer card-soft">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-apoio3 bg-apoio3/10 px-2 py-0.5 rounded-full">Matemática</span>
-              <span class="text-xs text-slate-400">ontem</span>
-            </div>
-            <h4 class="font-semibold text-sm">Funções do 2º Grau</h4>
-            <p class="text-xs text-slate-500 mt-1 line-clamp-2">Definição, vértice, discriminante e análise gráfica da parábola...</p>
-            <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
-              <span class="text-xs text-slate-400 font-medium"><i data-lucide=book-open class=ico></i> p.45–60</span>
-              <div class="ml-auto flex gap-2">
-                <button class="text-xs text-apoio3 hover:underline font-medium">Editar</button>
-                <span class="text-xs text-apoio2 font-semibold"><i data-lucide=check class=ico></i> Publicado</span>
-              </div>
-            </div>
-          </div>
-          <div class="bg-white rounded-xl border-2 border-dashed border-slate-200 p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition min-h-[140px]" onclick="openGenerateModal('resumo')">
-            <span class="text-3xl mb-2"><i data-lucide=sparkles class=ico></i></span>
-            <p class="text-sm font-semibold text-slate-600">Gerar novo resumo</p>
-            <p class="text-xs text-slate-400 mt-0.5">Escolha um capítulo do livro</p>
-          </div>
-        </div>
-
-        <!-- Resumos recomendados pela IA (Pro) -->
-        <div id="ai-recommended-summaries-section" class="relative bg-white rounded-2xl p-6 overflow-hidden card-soft">
-          <div class="lock-content" data-lock-content>
-            <div class="flex items-center gap-2 mb-4">
-              <span class="text-xl"><i data-lucide=bot class=ico></i></span>
-              <div>
-                <h3 class="font-semibold text-sm">Resumos recomendados pela IA</h3>
-                <p class="text-xs text-slate-500">Sugestões baseadas na sua performance geral</p>
-              </div>
-              <span class="ml-auto text-[10px] font-semibold bg-apoio3/10 text-apoio3 px-2 py-1 rounded-full">Plano Pro</span>
-            </div>
-            <div class="grid lg:grid-cols-3 gap-4">
-              <div class="border border-slate-100 rounded-xl p-3">
-                <div class="flex items-center gap-2 mb-2"><span class="text-xl"><i data-lucide=ruler class=ico></i></span><p class="text-sm font-semibold">Funções do 2º Grau</p></div>
-                <p class="text-xs text-slate-500"><strong>Motivo:</strong> Você demonstrou dificuldade em vértice e interpretação gráfica.</p>
-                <button onclick="openGenerateModal('resumo')" class="mt-3 w-full py-2 xp-gradient text-white text-xs font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-primary/25">Gerar resumo recomendado</button>
-              </div>
-              <div class="border border-slate-100 rounded-xl p-3">
-                <div class="flex items-center gap-2 mb-2"><span class="text-xl"><i data-lucide=dna class=ico></i></span><p class="text-sm font-semibold">Meiose</p></div>
-                <p class="text-xs text-slate-500"><strong>Motivo:</strong> Seus erros recentes indicam confusão entre mitose e meiose.</p>
-                <button onclick="openGenerateModal('resumo')" class="mt-3 w-full py-2 xp-gradient text-white text-xs font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-primary/25">Gerar resumo recomendado</button>
-              </div>
-              <div class="border border-slate-100 rounded-xl p-3">
-                <div class="flex items-center gap-2 mb-2"><span class="text-xl"><i data-lucide=flask-round class=ico></i></span><p class="text-sm font-semibold">Ligações Iônicas</p></div>
-                <p class="text-xs text-slate-500"><strong>Motivo:</strong> Você ainda não revisou este capítulo esta semana.</p>
-                <button onclick="openGenerateModal('resumo')" class="mt-3 w-full py-2 xp-gradient text-white text-xs font-semibold rounded-xl hover:opacity-90 transition shadow-md shadow-primary/25">Gerar resumo recomendado</button>
-              </div>
-            </div>
-          </div>
-          <div class="plan-overlay hidden" data-lock-overlay>
-            <div class="bg-white rounded-2xl shadow-card p-6 text-center max-w-xs card-soft">
-              <div class="text-3xl mb-2"><i data-lucide=lock class=ico></i></div>
-              <p class="text-sm font-semibold text-dark">Resumos recomendados pela IA disponíveis no Plano Pro</p>
-              <p class="text-xs text-slate-500 mt-1">A IA identifica suas lacunas e sugere os resumos certos para revisar.</p>
-              <button onclick="upgradeToPro()" class="mt-3 px-4 py-2 xp-gradient text-white rounded-xl text-xs font-semibold">Fazer upgrade para o Pro</button>
-            </div>
+      <div id="page-resumos" class="page">
+        <!-- Resumos · aluno (fiel ao design de referência; cabeçalho e livros montados por renderResumos) -->
+        <div class="lb rs" id="res-screen">
+          <div class="sh-head" id="res-head"></div>
+          <div class="lb-main fade-up">
+            <h2 class="lb-h1">Resumos</h2>
+            <p class="lb-sub">Gere um resumo da matéria que você está estudando!</p>
+            <div class="lb-grid" id="res-books"></div>
+            <h3 class="rs-sec">Resumos Gerados Anteriormente</h3>
+            <div class="rs-hist" id="res-history"></div>
           </div>
         </div>
         <!-- Resumos · professor (identidade inspirada na OpenAI; aparece só com #app-shell.oa-on) -->
@@ -3171,19 +3137,32 @@
   }
 
   // ─── Role UI ─────────────────────────────────────────
-  function renderHeaderNav(){
-    const nav=document.getElementById('header-nav'); if(!nav) return;
+  // ─── Header Navigation Dinâmico (Bordas 1.5px Neo-Brutalista) ───
+  function renderHeaderNav() {
+    const nav = document.getElementById('header-nav');
+    if(!nav) return;
     const cfg = navConfig[currentRole] || [];
     const def = getDefaultPageForRole(currentRole);
-    let html = `<button onclick="navigate('${def}')" class="px-3 py-2 rounded-xl text-sm font-semibold transition ${currentPage===def?'bg-primary text-white':'text-slate-600 hover:bg-slate-100'}">Início</button>`;
-    cfg.forEach((sec,i)=>{
-      const items = sec.items.filter(it=>it.page!==def && it.page!=='home');
+
+    // Classes de base com border-[1.5px] fixo para todos os botões do header
+    const baseBtn = "px-4 py-2 rounded-lg text-[13px] font-bold transition-all border-[1.5px] outline-none";
+    const activeBtn = `${baseBtn} border-[#e7191f] text-[#e7191f]`;
+    const inactiveBtn = `${baseBtn} border-black text-black hover:bg-slate-50 hover:shadow-[2px_2px_0px_#000]`;
+
+    let html = `<button onclick="navigate('${def}')" class="${currentPage === def ? activeBtn : inactiveBtn}">Início</button>`;
+
+    cfg.forEach((sec,i) => {
+      const items = sec.items.filter(it => it.page !== def && it.page !== 'home');
       if(!items.length) return;
-      const activeSec = items.some(it=>it.page===currentPage);
+      const activeSec = items.some(it => it.page === currentPage);
+
       html += `<div class="relative" onclick="event.stopPropagation()">
-        <button onclick="toggleHeaderMenu(${i})" class="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-semibold transition ${activeSec?'bg-primary/10 text-primary':'text-slate-600 hover:bg-slate-100'}">${sec.section}<span class="text-[10px] opacity-70">&#9662;</span></button>
-        <div id="hdrop-${i}" class="header-dropdown hidden absolute left-1/2 -translate-x-1/2 mt-1.5 w-56 bg-white rounded-2xl shadow-xl p-2 z-50 card-soft">
-          ${items.map(it=>`<button onclick="navigate('${it.page}');closeHeaderMenus()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-primary/5 hover:text-primary transition text-left"><span class="text-lg flex-shrink-0">${it.icon}</span>${it.label}</button>`).join('')}
+        <button onclick="toggleHeaderMenu(${i})" class="${activeSec ? activeBtn : inactiveBtn} flex items-center gap-1.5">
+          ${sec.section}
+        </button>
+        <!-- Menu Suspenso Neo-brutalista -->
+        <div id="hdrop-${i}" class="header-dropdown hidden absolute left-1/2 -translate-x-1/2 mt-3 w-56 bg-white rounded-xl shadow-[4px_4px_0px_#000] border-[2px] border-black p-2 z-50">
+          ${items.map(it => `<button onclick="navigate('${it.page}');closeHeaderMenus()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-black hover:bg-slate-50 transition-colors text-left"><span class="text-xl flex-shrink-0 grayscale">${it.icon}</span>${it.label}</button>`).join('')}
         </div>
       </div>`;
     });
@@ -3325,8 +3304,9 @@
     if (page !== 'home' && currentRole === 'student') lastStudentPage = page;
     // A home do aluno tem cabeçalho próprio (do design), então o topo padrão some só nela
     document.getElementById('app-shell').classList.toggle('sh-on', page === 'home' && currentRole === 'student');
-    document.getElementById('app-shell').classList.toggle('sc-on', page === 'chat' || page === 'biblioteca' || page === 'calendario');
+    document.getElementById('app-shell').classList.toggle('sc-on', page === 'chat' || page === 'biblioteca' || page === 'calendario' || (page === 'resumos' && currentRole !== 'teacher'));
     document.getElementById('app-shell').classList.toggle('oa-on', page === 'resumos' && currentRole === 'teacher');
+    if (page === 'resumos') renderResumos();
     if (page === 'chat') renderChat();
     if (page === 'calendario') renderCalendar();
     if (page === 'biblioteca') renderLibrary();
@@ -4024,7 +4004,7 @@
   }
   // Só um cabeçalho do design fica montado por vez (os menus usam ids fixos)
   function mountDesignHead(id){
-    ['chat-head', 'lib-head', 'cal-head'].forEach(h => { const el = document.getElementById(h); if (el) el.innerHTML = ''; });
+    ['chat-head', 'lib-head', 'cal-head', 'res-head'].forEach(h => { const el = document.getElementById(h); if (el) el.innerHTML = ''; });
     const el = document.getElementById(id); if (el) el.innerHTML = designHeadHTML();
   }
   function toggleChatMenu(i){
@@ -4151,6 +4131,53 @@
     const grid = document.getElementById('lib-books');
     if (grid && !grid.childElementCount) grid.innerHTML = libBooks.map(libBookHTML).join('') +
       `<div class="lb-empty"><span class="lb-q" aria-hidden="true">?</span><p>Novas Apostilas<br>aparecerão aqui!</p></div>`;
+  }
+
+  // ─── Resumos (aluno) ─────────────────────────────────
+  // Os livros são os da Biblioteca (libBooks/libArt); o histórico abaixo é o dos resumos já gerados
+  const resumoHistory = [
+    { key:'bio', subject:'Biologia',   pages:'p.87–102', title:'Mitose e Meiose Divisão celular mitótica e meiótica', desc:'diferenças, etapas e importância biológica...' },
+    { key:'mat', subject:'Matemática', pages:'p.45–60',  title:'Funções do 2º Grau', desc:'Definição, vértice, discriminante e análise gráfica da parábola...' },
+  ];
+
+  // Abre o modal "Gerar" já com a matéria do livro escolhida
+  function openResumoFor(key){
+    openGenerateModal('resumo');
+    const b = libBooks.find(x => x.key === key), sel = document.querySelector('#generate-modal select');
+    if (b && sel) sel.value = b.title;
+  }
+
+  function resumoBookHTML(b){
+    const art = libArt[b.key];
+    return `<div class="lb-book">
+      <button type="button" class="lb-cover" onclick="openResumoFor('${b.key}')" aria-label="Gerar resumo de ${b.title}">
+        <div class="lb-banner"><svg viewBox="${art.vb.join(' ')}" preserveAspectRatio="xMidYMin slice" aria-hidden="true">${art.svg}</svg></div>
+        <h3 class="lb-title">${b.title}</h3>
+        <p class="lb-meta">${b.meta}</p>
+      </button>
+      <div class="lb-bar" style="--p:${b.pct}%" role="progressbar" aria-valuenow="${b.pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso em ${b.title}"></div>
+      <p class="lb-pct">${b.pct}% Estudada</p>
+      <button type="button" class="rs-gen" onclick="openResumoFor('${b.key}')">GERAR RESUMO</button>
+    </div>`;
+  }
+
+  function renderResumos(){
+    if (currentRole === 'teacher') return; // o professor tem a versão própria desta tela
+    mountDesignHead('res-head');
+    const grid = document.getElementById('res-books');
+    if (grid && !grid.childElementCount) grid.innerHTML = libBooks.map(resumoBookHTML).join('') +
+      `<div class="lb-empty"><span class="lb-q" aria-hidden="true">?</span><p>Novos Resumos<br>aparecerão aqui!</p></div>`;
+    const hist = document.getElementById('res-history');
+    if (hist && !hist.childElementCount) hist.innerHTML = resumoHistory.map(r => `<article class="rs-hcard">
+        <span class="rs-tag">${r.subject.toUpperCase()}</span>
+        <h4 class="rs-ttl" title="${r.title}">${r.title}</h4>
+        <p class="rs-pg">${r.pages}</p>
+        <p class="rs-desc">${r.desc}</p>
+        <div class="rs-acts">
+          <button type="button" class="rs-btn rs-btn-o" onclick="openResumoFor('${r.key}')">Gerar novamente</button>
+          <button type="button" class="rs-btn rs-btn-f">Ir para o Resumo</button>
+        </div>
+      </article>`).join('');
   }
 
   // ─── Podcast ─────────────────────────────────────────
